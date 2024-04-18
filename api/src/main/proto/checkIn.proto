@@ -20,6 +20,6 @@ message CheckInCountersResponse {
   string airline = 2;
   string counters = 3;
   string sector = 4;
-  string queueSize = 5;
+  int32 queueSize = 5;
 }
 
