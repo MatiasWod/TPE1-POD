@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "commons.proto";
+
+package checkIn;
+
+option java_package = "ar.edu.itba.pod.checkIn";
+option java_multiple_files = true;
+
+service CheckInService {
+ rpc getCheckInCounters(Booking) returns (CheckInCountersResponse);
+}
+
+message Booking {
+  string code = 1;
+}
+
+message CheckInCountersResponse {
+  string flightCode = 1;
+  string airline = 2;
+  string counters = 3;
+  string sector = 4;
+  string queueSize = 5;
+}
+
