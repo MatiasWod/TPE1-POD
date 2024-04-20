@@ -1,7 +1,7 @@
 package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.admin.AdminServiceGrpc;
-import ar.edu.itba.pod.admin.SectorRequest;
+import ar.edu.itba.pod.admin.CountersRequest;
 import ar.edu.itba.pod.client.Action;
 import ar.edu.itba.pod.client.ServerUnavailableException;
 import ar.edu.itba.pod.client.Util;
@@ -11,9 +11,9 @@ import io.grpc.StatusRuntimeException;
 
 import java.util.List;
 
-public class SectorActions extends Action {
+public class CountersAction extends Action {
 
-    public SectorActions(List<String> argumentsForAction) {
+    public CountersAction(List<String> argumentsForAction) {
         super(argumentsForAction);
     }
 
@@ -21,12 +21,13 @@ public class SectorActions extends Action {
     public void run(ManagedChannel channel) {
         AdminServiceGrpc.AdminServiceBlockingStub stub = AdminServiceGrpc.newBlockingStub(channel);
 
-        try {
-            SectorRequest sectorRequest = SectorRequest
+        try{
+            CountersRequest countersRequest = CountersRequest
                     .newBuilder()
                     .setSectorName(System.getProperty("sector"))
+                    .setCounters(Integer.parseInt("counters"))
                     .build();
-            stub.addSector(sectorRequest);
+            stub.addCounters(countersRequest);
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
@@ -41,7 +42,13 @@ public class SectorActions extends Action {
 
     @Override
     public boolean hasValidArguments() {
-        return super.hasValidArguments();
+        try{
+            Integer.parseInt(System.getProperty("counters"));
+            return super.hasValidArguments();
+        }
+        catch (NumberFormatException exception){
+            return false;
+        }
     }
 
     @Override
@@ -50,8 +57,9 @@ public class SectorActions extends Action {
                 Usage:
                     $> ./adminClient
                         -DserverAddress=xx.xx.xx.xx:yyyy
-                        -Daction=addSector
+                        -Daction=addCounters
                         -Dsector=sectorName
+                        -Dcounters=counters
                 """;
     }
 }
