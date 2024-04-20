@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "commons.proto";
+
+package admin;
+
+option java_package = "ar.edu.itba.pod.admin";
+option java_multiple_files = true;
+
+service AdminService{
+  rpc addSector(SectorRequest) returns (commons.Empty);
+  rpc addCounters(CountersRequest) returns (commons.Empty);
+  rpc loadPassengerSet(PassengerRequest) returns (commons.Empty);
+}
+
+message SectorRequest{
+  string sectorName = 1;
+}
+
+message CountersRequest{
+  string sectorName = 1;
+  int32 counters = 2;
+}
+
+message PassengerRequest{
+  string bookingCode = 1;
+  string flightCode = 2;
+  string airlineName = 3;
+}
