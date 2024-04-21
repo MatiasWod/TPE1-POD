@@ -8,17 +8,33 @@ option java_package = "ar.edu.itba.pod.query";
 option java_multiple_files = true;
 
 service QueryService {
-    rpc getCountersState (Sector) returns (QueryCounterStateResponse);
+    rpc getCountersState (CountersStateRequest) returns (CountersStateResponse);
+    rpc getCheckInHistory (CheckInHistoryRequest) returns (CheckInHistoryResponse);
 }
 
-message Sector {
-    string code = 1;
+message CountersStateRequest{
+    string sectorName = 1;
 }
 
-message QueryCounterStateResponse {
-    string sector = 1;
-    string counters = 2;
-    string airline = 3;
-    string flight = 4;
-    string people = 5;
+message CountersStateResponse {
+    string sectorName = 1;
+    int32 counterStart = 2;
+    int32 counterEnd = 3;
+    string airlineName = 4;
+    string flightCode = 5;
+    int32 people = 6;
 }
+
+message CheckInHistoryRequest {
+    string sectorName=1;
+    string airlineName=2;
+}
+
+message CheckInHistoryResponse {
+    string sectorName = 1;
+    string counter = 2;
+    string airlineName = 3;
+    string flightCode = 4;
+    string bookingCode = 5;
+}
+
