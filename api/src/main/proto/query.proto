@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "commons.proto";
+
+package checkIn;
+
+option java_package = "ar.edu.itba.pod.query";
+option java_multiple_files = true;
+
+service QueryService {
+    rpc getCountersState (Sector) returns (QueryCounterStateResponse);
+}
+
+message Sector {
+    string code = 1;
+}
+
+message QueryCounterStateResponse {
+    string sector = 1;
+    string counters = 2;
+    string airline = 3;
+    string flight = 4;
+    string people = 5;
+}
