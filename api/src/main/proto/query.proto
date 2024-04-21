@@ -17,6 +17,10 @@ message CountersStateRequest{
 }
 
 message CountersStateResponse {
+    repeated CounterState countersState = 1;
+}
+
+message CounterState{
     string sectorName = 1;
     int32 counterStart = 2;
     int32 counterEnd = 3;
@@ -31,6 +35,10 @@ message CheckInHistoryRequest {
 }
 
 message CheckInHistoryResponse {
+    repeated CheckInHistory checkInsHistory = 1;
+}
+
+message CheckInHistory {
     string sectorName = 1;
     string counter = 2;
     string airlineName = 3;
