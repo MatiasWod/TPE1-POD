@@ -41,4 +41,8 @@ public class Airport {
             }
         }
     }
+
+    public void loadPassengerSet(String bookingCode, String flightCode, String airlineName){
+        //TODO completar
+    }
 }
