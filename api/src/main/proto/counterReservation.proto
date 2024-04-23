@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "commons.proto";
+
+package counterReservation;
+
+option java_package = "ar.edu.itba.pod.counterReservation";
+option java_multiple_files = true;
+
+service counterReservationService{
+  rpc getSectors(commons.Empty) returns (SectorsInformationResponse);
+}
+
+message Counter {
+  int32 counterId = 1;
+}
+
+message Sector {
+  string name = 1;
+  repeated Counter counters = 2;
+}
+
+message SectorsInformationResponse{
+  repeated Sector sectors = 1;
+}

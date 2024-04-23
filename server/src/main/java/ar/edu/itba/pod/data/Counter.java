@@ -7,4 +7,8 @@ public class Counter {
     public Counter(int counterId){
         this.counterId = counterId;
     }
+
+    public int getCounterId() {
+        return counterId;
+    }
 }
