@@ -27,6 +27,7 @@ public class SectorAction extends Action {
                     .setSectorName(System.getProperty("sector"))
                     .build();
             stub.addSector(sectorRequest);
+            System.out.printf("Sector %s added successfully", System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
@@ -34,9 +35,10 @@ public class SectorAction extends Action {
             } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
                 throw new ServerUnavailableException();
             }
+            System.err.println(Util.GENERIC_ERROR_MESSAGE);
+            System.exit(1);
         }
-        System.err.println(Util.GENERIC_ERROR_MESSAGE);
-        System.exit(1);
+
     }
 
     @Override

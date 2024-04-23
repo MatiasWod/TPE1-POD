@@ -62,10 +62,10 @@ public class ManifestAction extends Action {
         int failed = failedCalls.get();
         int successful = successfulCalls.get();
         if (failed > 0) {
-            System.out.printf("Cannot add %d attractions\n", failed);
+            //TODO
         }
         if (successful > 0) {
-            System.out.printf("%d attractions added\n", successful);
+            //TODO
         }
     }
 

@@ -25,9 +25,11 @@ public class CountersAction extends Action {
             CountersRequest countersRequest = CountersRequest
                     .newBuilder()
                     .setSectorName(System.getProperty("sector"))
-                    .setCounters(Integer.parseInt("counters"))
+                    .setCounters(Integer.parseInt(System.getProperty("counters")))
                     .build();
             stub.addCounters(countersRequest);
+            //TODO completar bien el print
+            System.out.printf("%d new counters (n-n) in Sector %s added successfully",Integer.parseInt(System.getProperty("counters")),System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
