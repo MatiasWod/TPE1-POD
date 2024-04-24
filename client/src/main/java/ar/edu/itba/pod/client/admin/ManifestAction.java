@@ -62,10 +62,10 @@ public class ManifestAction extends Action {
         int failed = failedCalls.get();
         int successful = successfulCalls.get();
         if (failed > 0) {
-            //TODO
+            System.out.printf("Failed to book %d flights\n",failed);
         }
         if (successful > 0) {
-            //TODO
+            System.out.printf("Booked %d flights succesfully\n",successful);
         }
     }
 
@@ -116,12 +116,14 @@ public class ManifestAction extends Action {
             }
             catch (StatusRuntimeException exception){
                 if (exception.getStatus() == Status.INVALID_ARGUMENT) {
+                    System.out.printf("Booking %s for %s %s addition failed\n",bookingCode,airlineName,flightCode);
                     failedCalls.getAndIncrement();
                     return;
                 }
                 System.err.println(Util.GENERIC_ERROR_MESSAGE);
                 System.exit(1);
             }
+            System.out.printf("Booking %s for %s %s added succesfully\n",bookingCode,airlineName,flightCode);
             successfulCalls.getAndIncrement();
         }
     }
