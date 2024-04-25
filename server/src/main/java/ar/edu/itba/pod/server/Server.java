@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.server;
 
+import ar.edu.itba.pod.servants.AdminServant;
 import ar.edu.itba.pod.servants.CheckInService;
 import ar.edu.itba.pod.servants.CounterReservationService;
 import ar.edu.itba.pod.servants.QueryServant;
@@ -17,6 +18,7 @@ public class Server {
 
         int port = 50051;
         io.grpc.Server server = ServerBuilder.forPort(port)
+                .addService(new AdminServant())
                 .addService(new CheckInService())
                 .addService(new CounterReservationService())
                 .addService(new QueryServant())

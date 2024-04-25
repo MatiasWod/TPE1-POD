@@ -29,7 +29,7 @@ public class CountersAction extends Action {
                     .build();
             stub.addCounters(countersRequest);
             //TODO completar bien el print
-            System.out.printf("%d new counters (n-n) in Sector %s added successfully",Integer.parseInt(System.getProperty("counters")),System.getProperty("sector"));
+            System.out.printf("%d new counters (n-n) in Sector %s added successfully\n",Integer.parseInt(System.getProperty("counters")),System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
@@ -37,9 +37,9 @@ public class CountersAction extends Action {
             } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
                 throw new ServerUnavailableException();
             }
+            System.err.println(Util.GENERIC_ERROR_MESSAGE);
+            System.exit(1);
         }
-        System.err.println(Util.GENERIC_ERROR_MESSAGE);
-        System.exit(1);
     }
 
     @Override

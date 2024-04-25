@@ -1,7 +1,6 @@
 package ar.edu.itba.pod.client.admin;
 
 import ar.edu.itba.pod.client.Action;
-import ar.edu.itba.pod.client.checkin.CountersAction;
 
 import java.util.List;
 
