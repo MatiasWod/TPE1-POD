@@ -40,7 +40,7 @@ message CheckInHistoryResponse {
 
 message CheckInHistory {
     string sectorName = 1;
-    string counter = 2;
+    int32 counterCode = 2;
     string airlineName = 3;
     string flightCode = 4;
     string bookingCode = 5;

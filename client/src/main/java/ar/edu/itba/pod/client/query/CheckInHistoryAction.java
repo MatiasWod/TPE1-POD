@@ -29,7 +29,7 @@ public class CheckInHistoryAction extends Action {
         try {
             stub.getCheckInHistory(request).getCheckInsHistoryList().forEach(checkInHistory -> {
                 System.out.println("Sector Name: " + checkInHistory.getSectorName());
-                System.out.println("Counter: " + checkInHistory.getCounter());
+                System.out.println("Counter: " + checkInHistory.getCounterCode());
                 System.out.println("Airline Name: " + checkInHistory.getAirlineName());
                 System.out.println("Flight Code: " + checkInHistory.getFlightCode());
                 System.out.println("Booking Code: " + checkInHistory.getBookingCode());

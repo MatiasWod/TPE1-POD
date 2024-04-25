@@ -1,5 +1,8 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.checkIn.CheckIn;
+import ar.edu.itba.pod.query.CheckInHistory;
+
 import java.util.*;
 
 public class Airport {
@@ -78,4 +81,44 @@ public class Airport {
             flights.get(airlineName).get(flightCode).getPassengerList().add(new Passenger(bookingCode,flightCode,airlineName));
         }
     }
+
+
+    //Query Service
+    public List<CounterState> getCountersState(String sectorName){
+        synchronized (sectorLock){
+            if (!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+
+            if(sectors.get(sectorName).getCounters().isEmpty()){
+                //TODO implementar
+                return null;
+            }
+            List<CounterState> counterStates = new ArrayList<>();
+            List<Counter> counters = sectors.get(sectorName).getCounters();
+            for (Counter counter: counters){
+                //TODO ordenar clases
+//                counterStates.add(new CounterState(sectorName,counters.getFirst().getCounterId(),counters.getLast().getCounterId(),counter.,counter.getFlightCode(),counter.getPeople()));
+            }
+            return counterStates;
+        }
+    }
+
+    public List<CheckInHistoryInfo> getCheckInHistory(String sectorName,String airlineName ){
+        synchronized (sectorLock){
+            if (!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();
+            for (Counter counter: sectors.get(sectorName).getCounters()){
+                //TODO ordenar clases
+//                for (CheckIn checkIn: counter.getCheckIns()){
+//                    checkInHistoryInfos.add(new CheckInHistoryInfo(checkIn.getBookingCode(),checkIn.getFlightCode(),checkIn.getAirlineCode(),sectorName,counter.getCounterId()));
+//                }
+            }
+            return checkInHistoryInfos;
+        }
+    }
+
+
 }

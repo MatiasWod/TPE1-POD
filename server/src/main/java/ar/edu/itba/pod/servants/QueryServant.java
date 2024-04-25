@@ -1,31 +1,37 @@
 package ar.edu.itba.pod.servants;
 
+import ar.edu.itba.pod.data.Airport;
 import ar.edu.itba.pod.query.*;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 public class QueryServant extends QueryServiceGrpc.QueryServiceImplBase {
+    private final Airport airport = Airport.getInstance();
 
     @Override
     public void getCountersState(CountersStateRequest request, StreamObserver<CountersStateResponse> responseObserver) {
         // Fetch data using request information
         System.out.println("Sector Name: " + request.getSectorName());
 
-        CountersStateResponse.Builder responseBuilder = CountersStateResponse.newBuilder();
-        responseBuilder.addCountersState(
-                CounterState.newBuilder()
-                        .setSectorName(request.getSectorName())
-                        .setCounterStart(1)
-                        .setCounterEnd(10)
-                        .setAirlineName("Sample Airline")
-                        .setFlightCode("ABC123")
-                        .setPeople(50)
-                        .build()
-        );
-
-        CountersStateResponse response = responseBuilder.build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+        try {
+            CountersStateResponse.Builder response = CountersStateResponse.newBuilder();
+            response.addAllCountersState(
+                    airport.getCountersState(request.getSectorName()).stream().
+                            map(counterState -> CounterState.newBuilder()
+                            .setSectorName(counterState.getSectorName())
+                            .setCounterStart(counterState.getCounterStart())
+                            .setCounterEnd(counterState.getCounterEnd())
+                            .setAirlineName(counterState.getAirlineName())
+                            .setFlightCode(counterState.getFlightCode())
+                            .setPeople(counterState.getPeople())
+                            .build()
+                    ).toList()
+            );
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
+        }catch (IllegalArgumentException exception){
+            responseObserver.onError(Status.INVALID_ARGUMENT.asRuntimeException());
+        }
     }
 
     @Override
@@ -33,21 +39,24 @@ public class QueryServant extends QueryServiceGrpc.QueryServiceImplBase {
         // Fetch data using request information
         System.out.println("Sector Name: " + request.getSectorName() + " " + "Airline Name: " + request.getAirlineName());
 
-        CheckInHistoryResponse.Builder responseBuilder = CheckInHistoryResponse.newBuilder();
-        responseBuilder.addCheckInsHistory(
-                CheckInHistory.newBuilder()
-                        .setSectorName(request.getSectorName())
-                        .setCounter("C")
-                        .setAirlineName(request.getAirlineName())
-                        .setFlightCode("ABC123")
-                        .setBookingCode("123456")
-                        .build()
-        );
-
-        CheckInHistoryResponse response = responseBuilder.build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
+        try {
+            CheckInHistoryResponse.Builder response = CheckInHistoryResponse.newBuilder();
+            response.addAllCheckInsHistory(
+                    airport.getCheckInHistory(request.getSectorName(), request.getAirlineName()).stream().
+                            map(checkInHistoryInfo -> CheckInHistory.newBuilder()
+                            .setSectorName(checkInHistoryInfo.getSectorName())
+                            .setCounterCode(checkInHistoryInfo.getCounterId())
+                            .setAirlineName(checkInHistoryInfo.getAirlineName())
+                            .setFlightCode(checkInHistoryInfo.getFlightCode())
+                            .setBookingCode(checkInHistoryInfo.getBookingCode())
+                            .build()
+                    ).toList()
+            );
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
+        }catch (IllegalArgumentException exception){
+            responseObserver.onError(Status.INVALID_ARGUMENT.asRuntimeException());
+        }
     }
 
 }
