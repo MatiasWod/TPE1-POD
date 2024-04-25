@@ -3,7 +3,7 @@ package ar.edu.itba.pod.servants;
 import ar.edu.itba.pod.query.*;
 import io.grpc.stub.StreamObserver;
 
-public class QueryService extends QueryServiceGrpc.QueryServiceImplBase {
+public class QueryServant extends QueryServiceGrpc.QueryServiceImplBase {
 
     @Override
     public void getCountersState(CountersStateRequest request, StreamObserver<CountersStateResponse> responseObserver) {

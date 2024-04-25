@@ -5,8 +5,8 @@ import ar.edu.itba.pod.client.Action;
 import java.util.List;
 
 public enum QueryActions {
-    COUNTERS_STATE("countersState", new CountersStateAction(List.of("sector"))),
-    CHECK_IN_HISTORY("checkInHistory", new CheckInHistoryAction(List.of("sector")));
+    COUNTERS_STATE("queryCounters", new CountersStateAction(List.of("sector"))),
+    CHECK_IN_HISTORY("checkins", new CheckInHistoryAction(List.of("sector","airline")));
 
 
     private final String actionName;

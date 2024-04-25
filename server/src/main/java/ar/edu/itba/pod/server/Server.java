@@ -2,6 +2,7 @@ package ar.edu.itba.pod.server;
 
 import ar.edu.itba.pod.servants.CheckInService;
 import ar.edu.itba.pod.servants.CounterReservationService;
+import ar.edu.itba.pod.servants.QueryServant;
 import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ public class Server {
         io.grpc.Server server = ServerBuilder.forPort(port)
                 .addService(new CheckInService())
                 .addService(new CounterReservationService())
+                .addService(new QueryServant())
                 .build();
         server.start();
         logger.info("Server started, listening on " + port);

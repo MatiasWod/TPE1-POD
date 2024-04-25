@@ -19,8 +19,8 @@ public class CheckInHistoryAction extends Action {
     public void run(ManagedChannel channel) {
         QueryServiceGrpc.QueryServiceBlockingStub stub = QueryServiceGrpc.newBlockingStub(channel);
         CheckInHistoryRequest request = CheckInHistoryRequest.newBuilder()
-                .setSectorName(System.getProperty("sectorName"))
-                .setAirlineName(System.getProperty("airlineName"))
+                .setSectorName(System.getProperty("sector"))
+                .setAirlineName(System.getProperty("airline"))
                 .build();
 
         System.out.println("Check-in history:");

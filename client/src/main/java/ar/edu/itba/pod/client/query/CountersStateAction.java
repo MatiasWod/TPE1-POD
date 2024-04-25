@@ -21,7 +21,7 @@ public class CountersStateAction extends Action {
     @Override
     public void run(ManagedChannel channel) {
         QueryServiceGrpc.QueryServiceBlockingStub stub = QueryServiceGrpc.newBlockingStub(channel);
-        CountersStateRequest request = CountersStateRequest.newBuilder().setSectorName(System.getProperty("sectorName")).build();
+        CountersStateRequest request = CountersStateRequest.newBuilder().setSectorName(System.getProperty("sector")).build();
         System.out.println("Counters state:");
 
         try {
