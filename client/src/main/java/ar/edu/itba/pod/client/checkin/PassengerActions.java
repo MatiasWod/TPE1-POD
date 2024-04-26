@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 public enum PassengerActions {
-    COUNTERS("fetchCounter", new CountersAction(List.of("booking")));
+    COUNTERS("fetchCounter", new CountersAction(List.of("booking"))),
+    GET_IN_LINE("passengerCheckin", new GetInLineAction(List.of("booking", "sector", "counter"))),
+    PASSENGER_STATUS("passengerStatus", new GetPassengerStatusAction(List.of("booking")));
     private final String actionName;
 
     private final Action action;

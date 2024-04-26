@@ -9,8 +9,11 @@ option java_multiple_files = true;
 
 service CheckInService {
  rpc getCheckInCounters(Booking) returns (CheckInCountersResponse);
+ rpc getInLine(GetInlineRequest) returns (GetInlineResponse);
+ rpc getPassengerStatus(Booking) returns (GetPassengerStatusResponse);
 }
 
+// Get counters from booking messages
 message Booking {
   string code = 1;
 }
@@ -21,5 +24,38 @@ message CheckInCountersResponse {
   string counters = 3;
   string sector = 4;
   int32 queueSize = 5;
+}
+
+// Get in line messages
+
+message GetInlineRequest {
+  string booking = 1;
+  string sectorName = 2;
+  int32 counterNumber = 3;
+}
+
+message GetInlineResponse {
+  bool isOk = 1;
+  int32 queueSize = 2;
+  string booking = 3;
+  string sector = 4;
+  string counters = 5;
+  string flightCode = 6;
+  string airline = 7;
+}
+
+// Passenger status messages
+enum PassengerStatus {
+  newBorn = 0;
+  onQueue = 1;
+  checkedIn = 2;
+}
+
+message GetPassengerStatusResponse {
+  string sector = 1;
+  string counters = 2;
+  string counter = 3;
+  int32 queueSize = 4;
+  PassengerStatus status = 5;
 }
 
