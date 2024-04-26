@@ -62,14 +62,17 @@ public class Airport {
     public void loadPassengerSet(String bookingCode, String flightCode, String airlineName){
         //TODO dejarlo mas lindo
         synchronized (flightsLock){
-            if (bookingCode.length() != BOOKING_CODE_LENGTH) {
-                throw new IllegalArgumentException();
-            }
-            //TODO ver si se puede hacer mas lindo y falta el caso de ver si existe el pasajero
+            //TODO revisar
             for (Airline m : airlines.values()) {
-                if (m.getFlights().containsKey(flightCode) && (!m.getFlights().get(flightCode).getAirlineName().equals(airlineName) ||
-                        m.getFlights().get(flightCode).getPassengerList().stream().anyMatch(p -> p.getBookingCode().equals(bookingCode)))) {
+                if (m.getFlights().containsKey(flightCode) && (!m.getFlights().get(flightCode).getAirlineName().equals(airlineName))) {
                     throw new IllegalArgumentException();
+                }
+            }
+            for (Airline a : airlines.values()){
+                for(Flight f : a.getFlights().values()){
+                    if(f.getPassengerList().contains(new Passenger(bookingCode,flightCode,airlineName))){
+                        throw new IllegalArgumentException();
+                    }
                 }
             }
             airlines.putIfAbsent(airlineName, new Airline());
