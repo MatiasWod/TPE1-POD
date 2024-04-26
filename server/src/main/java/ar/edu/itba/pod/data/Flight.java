@@ -24,4 +24,8 @@ public class Flight {
     public String getAirlineName() {
         return airlineName;
     }
+
+    public void addPassenger(Passenger passenger){
+        passengerList.add(passenger);
+    }
 }

@@ -12,7 +12,7 @@ public class Sector {
     }
 
     public void addCounter(int counterId){
-        counters.add(new Counter(counterId));
+        counters.add(new Counter(counterId, this));
     }
 
     public List<Counter> getCounters(){

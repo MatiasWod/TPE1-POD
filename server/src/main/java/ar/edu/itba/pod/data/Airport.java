@@ -1,15 +1,12 @@
 package ar.edu.itba.pod.data;
 
-import ar.edu.itba.pod.checkIn.CheckIn;
-import ar.edu.itba.pod.query.CheckInHistory;
-
 import java.util.*;
 
 public class Airport {
     private static Airport airport = null;
     private final Map<String, Sector> sectors = new HashMap<>();
     private final Object sectorLock = "sectorLock";
-    private final Map<String,Map<String,Flight>> flights = new HashMap<>();
+    private final Map<String, Airline> airlines = new HashMap<>();
     private final Object flightsLock = "flightsLock";
     private int globalCounterNumber = 1;
     private static final int COUNTERS_INCORRECT_COUNT = 0; //Just not a magic number
@@ -65,20 +62,18 @@ public class Airport {
     public void loadPassengerSet(String bookingCode, String flightCode, String airlineName){
         //TODO dejarlo mas lindo
         synchronized (flightsLock){
-            if (bookingCode.length() != BOOKING_CODE_LENGTH ||
-                    flights.getOrDefault(airlineName,new HashMap<>())
-                                    .getOrDefault(flightCode,new Flight(new ArrayList<>(),flightCode,airlineName))
-                            .getPassengerList().contains(new Passenger(airlineName,flightCode,bookingCode))){
+            if (bookingCode.length() != BOOKING_CODE_LENGTH) {
                 throw new IllegalArgumentException();
             }
-            for (Map<String, Flight> m:flights.values()){
-                if(m.containsKey(flightCode) && !m.get(flightCode).getAirlineName().equals(airlineName)){
+            //TODO ver si se puede hacer mas lindo y falta el caso de ver si existe el pasajero
+            for (Airline m : airlines.values()) {
+                if (m.getFlights().containsKey(flightCode) && (!m.getFlights().get(flightCode).getAirlineName().equals(airlineName) ||
+                        m.getFlights().get(flightCode).getPassengerList().stream().anyMatch(p -> p.getBookingCode().equals(bookingCode)))) {
                     throw new IllegalArgumentException();
                 }
             }
-            flights.putIfAbsent(airlineName,new HashMap<>());
-            flights.get(airlineName).putIfAbsent(flightCode,new Flight(new ArrayList<>(),flightCode,airlineName));
-            flights.get(airlineName).get(flightCode).getPassengerList().add(new Passenger(bookingCode,flightCode,airlineName));
+            airlines.putIfAbsent(airlineName, new Airline());
+            airlines.get(airlineName).loadFlight(airlineName, flightCode, bookingCode);
         }
     }
 
