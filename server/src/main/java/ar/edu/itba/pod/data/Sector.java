@@ -31,6 +31,7 @@ public class Sector {
         CounterRange current = null;
 
         for(Counter counter : counters){
+            //TODO CHANGE AIRLINE COMPARISION TO COUNTERRANGE COMPARISION (CHECK IF CONTIANS THE SAME FLIGHT ALSO)
             if(counter.getCounterId() >= min){
                 if(lastCounterAirline.equals(counter.getAirline())){
                     current.setCounterId(counter.getCounterId());
@@ -44,6 +45,41 @@ public class Sector {
             }
         }
         return countersInRange;
+    }
 
+    public void assignCounters(int counterCount, Airline airline, List<String> flights){
+        int startPosition = getPositionForCountersAssignment(counterCount);
+        if(startPosition == -1){
+            //TODO ASSIGN PENDIENTES
+        }
+        for(Counter counter : counters){
+            if(counter.getCounterId() >= startPosition && counter.getCounterId() < startPosition+counterCount){
+                for(String flight : flights){
+                    counter.addFlight(airline.getFlight(flight));
+                }
+            }
+        }
+    }
+
+    public int getPositionForCountersAssignment(int counterCount){
+        int firstCounterId = -1;
+        int counterContCount = 0;
+        for(Counter counter : counters){
+            if(counter.isFree()){
+                if(counter.getCounterId() == firstCounterId+1){
+                    counterContCount++;
+                } else{
+                    firstCounterId = counter.getCounterId();
+                    counterContCount=1;
+                }
+            } else{
+                counterContCount = 0;
+                firstCounterId = -1;
+            }
+            if(counterContCount == counterCount){
+                return firstCounterId;
+            }
+        }
+        return -1;
     }
 }

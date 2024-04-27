@@ -20,4 +20,8 @@ public class Airline {
         return flights;
     }
 
+    public Flight getFlight(String flightCode){
+        return flights.get(flightCode);
+    }
+
 }

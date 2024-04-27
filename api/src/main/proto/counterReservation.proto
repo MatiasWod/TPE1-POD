@@ -10,6 +10,7 @@ option java_multiple_files = true;
 service counterReservationService{
   rpc listSectors(commons.Empty) returns (SectorsInformationResponse);
   rpc listCounters(ListCounterRequest) returns (ListCounterResponse);
+  rpc assignCounters(AssignCountersRequest) returns (commons.Empty);
 }
 
 message Counter {
@@ -40,4 +41,11 @@ message CountersInformation {
     int32 lastCounter = 2;
     repeated string flights = 3;
     int32 people = 4;
+}
+
+message AssignCountersRequest {
+    string sector = 1;
+    repeated string flights = 2;
+    string airline = 3;
+    int32 counterCount = 4;
 }

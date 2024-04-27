@@ -4,10 +4,7 @@ import ar.edu.itba.pod.client.Action;
 import ar.edu.itba.pod.client.ServerUnavailableException;
 import ar.edu.itba.pod.client.Util;
 import ar.edu.itba.pod.commons.Empty;
-import ar.edu.itba.pod.counterReservation.ListCounterRequest;
-import ar.edu.itba.pod.counterReservation.ListCounterResponse;
-import ar.edu.itba.pod.counterReservation.SectorsInformationResponse;
-import ar.edu.itba.pod.counterReservation.counterReservationServiceGrpc;
+import ar.edu.itba.pod.counterReservation.*;
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -35,9 +32,20 @@ public class ListCountersAction extends Action {
             System.out.println("########################");
 
             // TODO CORREGIR EL FORMATO
-            response.getCountersInformationList().forEach(counterRange->{
-                System.out.printf("%d, %d, %d",counterRange.getFirstCounter(),  counterRange.getLastCounter(), counterRange.getPeople());
-            });
+            List<CountersInformation> countersInformation = response.getCountersInformationList();
+            for(CountersInformation counter : countersInformation){
+                System.out.printf("(%d-%d)\t%s\t");
+                /*TODO FIX FLIGHT LIST
+                if(!counter.getFlightsList().isEmpty()){
+                    for(String flight : counter.getFlightsList()){
+                        System.out.printf("%s|", flight);
+                    }
+                }else{
+                    System.out.printf("-\t");
+                }*/
+                System.out.printf("%d\n",counter.getPeople());
+            }
+
             }
         catch(StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){

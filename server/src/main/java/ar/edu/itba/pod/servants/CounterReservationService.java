@@ -5,6 +5,7 @@ import ar.edu.itba.pod.checkIn.CheckInCountersResponse;
 import ar.edu.itba.pod.commons.Empty;
 import ar.edu.itba.pod.counterReservation.*;
 import ar.edu.itba.pod.data.Airport;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.stream.Collectors;
@@ -46,5 +47,12 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
         ).build();
         responseStreamObserver.onNext(response);
         responseStreamObserver.onCompleted();
+    }
+
+    @Override
+    public void assignCounters(AssignCountersRequest request, StreamObserver<Empty> responseObserver){
+        airport.assignCounters(request.getSector(),request.getCounterCount(), request.getAirline(), request.getFlightsList());
+        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onCompleted();
     }
 }

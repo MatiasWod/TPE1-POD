@@ -119,15 +119,31 @@ public class Airport {
     }
 
 
-    public List<CounterRange> getCountersInRange(String sector, int min, int max){
+    public List<CounterRange> getCountersInRange(String sectorName, int min, int max){
         synchronized (sectorLock){
-            if(!sectors.containsKey(sector)){
+            if(!sectors.containsKey(sectorName)){
                 throw new IllegalArgumentException();
             }
             if( (max-min) >= 1 ){
-                return sectors.get(sector).getCountersInRange(min,max);
+                return sectors.get(sectorName).getCountersInRange(min,max);
             }else{
                 throw new IllegalArgumentException();
             }
         }
-    }}
+    }
+
+    public void assignCounters(String sectorName, int counterCount, String airlineString, List<String> flights ){
+        synchronized (sectorLock){
+            if(!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            if(!airlines.containsKey(airlineString)){
+                throw new IllegalArgumentException();
+            }
+            //TODO No se agregaron pasajeros esperados con el código de vuelo, para al menos uno de los vuelos solicitados
+            //TODO check that all flights EXISTS AND have passangers waiting (ARRIBA)
+            sectors.get(sectorName).assignCounters(counterCount, airlines.get(airlineString), flights);
+        }
+
+    }
+}
