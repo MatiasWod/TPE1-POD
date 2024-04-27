@@ -10,7 +10,7 @@ option java_multiple_files = true;
 service counterReservationService{
   rpc listSectors(commons.Empty) returns (SectorsInformationResponse);
   rpc listCounters(ListCounterRequest) returns (ListCounterResponse);
-  rpc assignCounters(AssignCountersRequest) returns (commons.Empty);
+  rpc assignCounters(AssignCountersRequest) returns (AssignCountersResponse);
   rpc freeCounters(FreeCountersRequest) returns (commons.Empty);
   rpc checkInCounters(checkInCountersRequest) returns (commons.Empty);
 }
@@ -56,6 +56,11 @@ message checkInCountersRequest {
   string sectorName  = 1;
   int32 fromVal = 2;
   string airlineName = 3;
+}
+
+message AssignCountersResponse{
+    int32 firstPosition = 1;
+    int32 pendingAhead = 2;
 }
 
 message FreeCountersRequest{
