@@ -24,7 +24,7 @@ public class CountersAction extends Action {
         try {
             CheckInCountersResponse response = stub.getCheckInCounters(
                     Booking.newBuilder()
-                            .setCode("XYZ345")
+                            .setCode(System.getProperty("booking"))
                             .build()
             );
 

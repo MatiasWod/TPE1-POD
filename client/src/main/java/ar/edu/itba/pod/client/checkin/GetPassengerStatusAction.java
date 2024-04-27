@@ -20,29 +20,34 @@ public class GetPassengerStatusAction extends Action {
         CheckInServiceGrpc.CheckInServiceBlockingStub stub = CheckInServiceGrpc.newBlockingStub(channel);
 
         try {
+            String booking = System.getProperty("booking");
             GetPassengerStatusResponse response = stub.getPassengerStatus(
                     Booking.newBuilder()
-                            .setCode("XYZ345")
+                            .setCode(booking)
                             .build()
             );
-            // TODO: Write messages
             switch (response.getStatus()) {
                 case newBorn: {
-                    System.out.println();
+                    System.out.printf("Booking %s for flight %s from %s can check-in" +
+                                    "on counters %s in Sector %s%n",
+                            booking, response.getFlightCode(),
+                            response.getAirline(), response.getCounters(), response.getSector());
                     break;
                 }
                 case onQueue: {
-                    System.out.println();
+                    System.out.printf("Booking %s for flight %s from %s is now waiting to check-in" +
+                                    "on counters %s in Sector %s with %d people in line%n",
+                            booking, response.getFlightCode(),
+                            response.getAirline(),response.getCounters(), response.getSector(), response.getQueueSize());
                     break;
                 }
                 case checkedIn: {
-                    System.out.println();
+                    System.out.printf("Booking %s for flight %s from %s checked in" +
+                                    "at counter %s in Sector %s%n",
+                            booking, response.getFlightCode(),
+                            response.getAirline(), response.getCheckInCounter(), response.getSector());
                 }
             }
-//            System.out.printf("Booking %s for flight %s from %s is now waiting to check-in" +
-//                            "on counters %s in Sector %s with %d people in line%n",
-//                    response.getBooking(), response.getFlightCode(),
-//                    response.getAirline(),response.getCounters(), response.getSector(), response.getQueueSize());
         } catch (StatusRuntimeException e) {
             if (e.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();

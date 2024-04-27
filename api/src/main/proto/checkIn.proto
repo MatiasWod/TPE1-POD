@@ -56,6 +56,9 @@ message GetPassengerStatusResponse {
   string counters = 2;
   string counter = 3;
   int32 queueSize = 4;
-  PassengerStatus status = 5;
+  string flightCode = 5;
+  PassengerStatus status = 6;
+  string airline = 7;
+  string checkInCounter = 8;
 }
 

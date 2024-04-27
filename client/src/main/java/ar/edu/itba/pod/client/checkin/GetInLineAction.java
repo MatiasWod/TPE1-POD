@@ -22,9 +22,9 @@ public class GetInLineAction extends Action {
         try {
             GetInlineResponse response = stub.getInLine(
                     GetInlineRequest.newBuilder()
-                            .setBooking("XYZ345")
-                            .setCounterNumber(3)
-                            .setSectorName("3")
+                            .setBooking(System.getProperty("booking"))
+                            .setCounterNumber(Integer.parseInt(System.getProperty("counter")))
+                            .setSectorName(System.getProperty("sector"))
                             .build()
             );
 
