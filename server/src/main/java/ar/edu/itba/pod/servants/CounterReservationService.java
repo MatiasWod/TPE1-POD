@@ -55,4 +55,11 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void freeCounters(FreeCountersRequest request, StreamObserver<Empty> responseObserver) {
+        airport.freeCounters(request.getSectorName(),request.getCounterFrom(),request.getAirlineName());
+        responseObserver.onNext(Empty.newBuilder().build());
+        responseObserver.onCompleted();
+    }
 }

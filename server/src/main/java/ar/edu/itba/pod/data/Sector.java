@@ -1,13 +1,17 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
 import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 public class Sector {
     private final String name;
     private final List<Counter> counters = new ArrayList<>();
+    private final BlockingQueue<AirlineCounterRequest> airlineBlockingQueue = new SynchronousQueue<>();
 
     public Sector(String name){
         this.name = name;
@@ -51,7 +55,26 @@ public class Sector {
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
             //TODO ASSIGN PENDIENTES
+            airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
         }
+        addFlightsToCounters(startPosition,counterCount,flights,airline);
+    }
+
+    public void freeCounters(int counterFrom, Airline airline){
+        //TODO revisar el método
+        for(Counter counter : counters){
+            if(counter.getCounterId() >= counterFrom && counter.getAirline().equals(airline.getAirlineName())){
+                counter.freeCounter();
+            }
+        }
+        if (!airlineBlockingQueue.isEmpty()) {
+            AirlineCounterRequest aux = airlineBlockingQueue.peek();
+            int startPosition = getPositionForCountersAssignment(aux.getCountersAmount());
+            addFlightsToCounters(startPosition, counterFrom,aux.getFlights(),aux.getAirline());
+        }
+    }
+
+    private void addFlightsToCounters(int startPosition, int counterCount, List<String> flights, Airline airline){
         for(Counter counter : counters){
             if(counter.getCounterId() >= startPosition && counter.getCounterId() < startPosition+counterCount){
                 for(String flight : flights){
@@ -61,7 +84,7 @@ public class Sector {
         }
     }
 
-    public int getPositionForCountersAssignment(int counterCount){
+    private int getPositionForCountersAssignment(int counterCount){
         int firstCounterId = -1;
         int counterContCount = 0;
         for(Counter counter : counters){

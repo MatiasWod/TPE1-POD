@@ -11,6 +11,7 @@ service counterReservationService{
   rpc listSectors(commons.Empty) returns (SectorsInformationResponse);
   rpc listCounters(ListCounterRequest) returns (ListCounterResponse);
   rpc assignCounters(AssignCountersRequest) returns (commons.Empty);
+  rpc freeCounters(FreeCountersRequest) returns (commons.Empty);
 }
 
 message Counter {
@@ -48,4 +49,10 @@ message AssignCountersRequest {
     repeated string flights = 2;
     string airline = 3;
     int32 counterCount = 4;
+}
+
+message FreeCountersRequest{
+    string sectorName = 1;
+    int32 counterFrom = 2;
+    string airlineName = 3;
 }

@@ -75,7 +75,7 @@ public class Airport {
                     }
                 }
             }
-            airlines.putIfAbsent(airlineName, new Airline());
+            airlines.putIfAbsent(airlineName, new Airline(airlineName));
             airlines.get(airlineName).loadFlight(airlineName, flightCode, bookingCode);
         }
     }
@@ -145,5 +145,19 @@ public class Airport {
             sectors.get(sectorName).assignCounters(counterCount, airlines.get(airlineString), flights);
         }
 
+    }
+
+    public void freeCounters(String sectorName, int counterFrom, String airlineName){
+        synchronized (sectorLock){
+            //TODO falta ver si existen pasajeros esperando a ser atendidos en la cola del rango
+            if(!airlines.containsKey(airlineName)){
+                throw new IllegalArgumentException();
+            }
+            if (!sectors.containsKey(sectorName) || sectors.get(sectorName).getCounters().isEmpty() ||
+                !sectors.get(sectorName).getCounters().get(0).getAirline().equals(airlineName)){
+                throw new IllegalArgumentException();
+            }
+            sectors.get(sectorName).freeCounters(counterFrom,airlines.get(airlineName));
+        }
     }
 }
