@@ -50,9 +50,9 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
     }
 
     @Override
-    public void assignCounters(AssignCountersRequest request, StreamObserver<Empty> responseObserver){
-        airport.assignCounters(request.getSector(),request.getCounterCount(), request.getAirline(), request.getFlightsList());
-        responseObserver.onNext(Empty.newBuilder().build());
+    public void assignCounters(AssignCountersRequest request, StreamObserver<AssignCountersResponse> responseObserver){
+        AssignCountersResponse response = airport.assignCounters(request.getSector(),request.getCounterCount(), request.getAirline(), request.getFlightsList());
+        responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 

@@ -1,5 +1,7 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
+
 import java.util.*;
 
 public class Airport {
@@ -132,7 +134,7 @@ public class Airport {
         }
     }
 
-    public void assignCounters(String sectorName, int counterCount, String airlineString, List<String> flights ){
+    public AssignCountersResponse assignCounters(String sectorName, int counterCount, String airlineString, List<String> flights ){
         synchronized (sectorLock){
             if(!sectors.containsKey(sectorName)){
                 throw new IllegalArgumentException();
@@ -142,7 +144,7 @@ public class Airport {
             }
             //TODO No se agregaron pasajeros esperados con el código de vuelo, para al menos uno de los vuelos solicitados
             //TODO check that all flights EXISTS AND have passangers waiting (ARRIBA)
-            sectors.get(sectorName).assignCounters(counterCount, airlines.get(airlineString), flights);
+            return sectors.get(sectorName).assignCounters(counterCount, airlines.get(airlineString), flights);
         }
 
     }

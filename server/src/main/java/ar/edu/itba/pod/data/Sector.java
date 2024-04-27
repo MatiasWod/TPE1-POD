@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
 import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
 import org.checkerframework.checker.units.qual.C;
 
@@ -52,15 +53,39 @@ public class Sector {
         return countersInRange;
     }
 
-    public void assignCounters(int counterCount, Airline airline, List<String> flights){
+    public AssignCountersResponse assignCounters(int counterCount, Airline airline, List<String> flights){
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
             //TODO ASSIGN PENDIENTES
             System.out.println("Adding wachito to queue");
             airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
-            return;
+            return AssignCountersResponse.newBuilder().setFirstPosition(-1).setPendingAhead(airlineBlockingQueue.size()).build();
         }
         addFlightsToCounters(startPosition,counterCount,flights,airline);
+        return AssignCountersResponse.newBuilder().setFirstPosition(startPosition).setPendingAhead(-1).build();
+    }
+
+    private int getPositionForCountersAssignment(int counterCount){
+        int firstCounterId = -1;
+        int counterContCount = 0;
+        for(Counter counter : counters){
+            if(counter.isFree()){
+                if(counter.getCounterId() == firstCounterId+counterContCount){
+                    counterContCount++;
+
+                } else{
+                    firstCounterId = counter.getCounterId();
+                    counterContCount=1;
+                }
+            } else{
+                counterContCount = 0;
+                firstCounterId = -1;
+            }
+            if(counterContCount == counterCount){
+                return firstCounterId;
+            }
+        }
+        return -1;
     }
 
     public void freeCounters(int counterFrom, Airline airline) {
@@ -90,26 +115,5 @@ public class Sector {
         }
     }
 
-    private int getPositionForCountersAssignment(int counterCount){
-        int firstCounterId = -1;
-        int counterContCount = 0;
-        for(Counter counter : counters){
-            if(counter.isFree()){
-                if(counter.getCounterId() == firstCounterId+counterContCount){
-                    counterContCount++;
 
-                } else{
-                    firstCounterId = counter.getCounterId();
-                    counterContCount=1;
-                }
-            } else{
-                counterContCount = 0;
-                firstCounterId = -1;
-            }
-            if(counterContCount == counterCount){
-                return firstCounterId;
-            }
-        }
-        return -1;
-    }
 }

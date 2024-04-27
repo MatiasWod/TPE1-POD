@@ -5,6 +5,7 @@ import ar.edu.itba.pod.client.ServerUnavailableException;
 import ar.edu.itba.pod.client.Util;
 import ar.edu.itba.pod.commons.Empty;
 import ar.edu.itba.pod.counterReservation.AssignCountersRequest;
+import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
 import ar.edu.itba.pod.counterReservation.SectorsInformationResponse;
 import ar.edu.itba.pod.counterReservation.counterReservationServiceGrpc;
 import io.grpc.ManagedChannel;
@@ -34,8 +35,16 @@ public class AsignCountersAction extends Action {
                 assignCountersRequestBuilder.addFlights(flight);
             }
 
-            stub.assignCounters(assignCountersRequestBuilder.build());
-            System.out.println("FINISHED");
+            AssignCountersResponse response =  stub.assignCounters(assignCountersRequestBuilder.build());
+            if(response.getFirstPosition() == -1){
+                System.out.printf("%d counters in Sector %s is pending with %d other pending ahead.", Integer.parseInt(System.getProperty("counterCount")),
+                        System.getProperty("sector"), response.getPendingAhead());
+            }else{
+                System.out.printf(" %d counters (%d-%d) in Sector %s are now checking in passengers from %s %s flights.", Integer.parseInt(System.getProperty("counterCount")),
+                        response.getFirstPosition(), response.getFirstPosition() + Integer.parseInt(System.getProperty("counterCount")),
+                        System.getProperty("sector"), System.getProperty("airline"), System.getProperty("flights"));
+            }
+
         } catch (StatusRuntimeException exception) {
             if (exception.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();
