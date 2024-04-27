@@ -14,16 +14,7 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
     private final Airport airport = Airport.getInstance();
 
     @Override
-    public void getSectors(Empty request, StreamObserver<SectorsInformationResponse> responseObserver) {
-        /*
-        SectorsInformationResponse response = SectorsInformationResponse.newBuilder().addAllSectors(
-                airport.getSectors().stream().map(sector -> Sector
-                        .newBuilder()
-                        .setName(sector.getName())
-                        .setCounters()
-                        .build()).collect(Collectors.toList())
-        ).build();
-        */
+    public void listSectors(Empty request, StreamObserver<SectorsInformationResponse> responseObserver) {
         SectorsInformationResponse response = SectorsInformationResponse.newBuilder().addAllSectors(
                 airport.getSectors().stream().map(sector -> {
                     Sector.Builder sectorBuilder = Sector.newBuilder().setName(sector.getName());
@@ -33,5 +24,27 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
         ).build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
+    }
+
+
+    @Override
+    public void listCounters(ListCounterRequest request, StreamObserver<ListCounterResponse> responseStreamObserver){
+        ListCounterResponse response = ListCounterResponse.newBuilder().addAllCountersInformation(
+                airport.getCountersInRange(request.getSectorName(), request.getCounterStart(), request.getCounterEnd()).stream().map(
+                        counterRange -> {
+                            CountersInformation.Builder countersInformationBuilder = CountersInformation.newBuilder()
+                                    .setFirstCounter(counterRange.getFirstCounter().getCounterId())
+                                    .setLastCounter(counterRange.getLastCounterId());
+                            counterRange.getFirstCounter().getFlights().forEach(flight -> {
+                                if (flight != null) {
+                                    countersInformationBuilder.addFlights(flight.getFlightCode());
+                                }
+                            });
+                            countersInformationBuilder.setPeople(780556); //TODO PONER ESTO
+                            return countersInformationBuilder.build();
+                        }).collect(Collectors.toList())
+        ).build();
+        responseStreamObserver.onNext(response);
+        responseStreamObserver.onCompleted();
     }
 }

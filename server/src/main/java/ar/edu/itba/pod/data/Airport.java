@@ -119,4 +119,15 @@ public class Airport {
     }
 
 
-}
+    public List<CounterRange> getCountersInRange(String sector, int min, int max){
+        synchronized (sectorLock){
+            if(!sectors.containsKey(sector)){
+                throw new IllegalArgumentException();
+            }
+            if( (max-min) >= 1 ){
+                return sectors.get(sector).getCountersInRange(min,max);
+            }else{
+                throw new IllegalArgumentException();
+            }
+        }
+    }}

@@ -8,7 +8,8 @@ option java_package = "ar.edu.itba.pod.counterReservation";
 option java_multiple_files = true;
 
 service counterReservationService{
-  rpc getSectors(commons.Empty) returns (SectorsInformationResponse);
+  rpc listSectors(commons.Empty) returns (SectorsInformationResponse);
+  rpc listCounters(ListCounterRequest) returns (ListCounterResponse);
 }
 
 message Counter {
@@ -22,4 +23,21 @@ message Sector {
 
 message SectorsInformationResponse{
   repeated Sector sectors = 1;
+}
+
+message ListCounterRequest {
+  string sectorName = 1;
+  int32 counterStart = 2;
+  int32 counterEnd = 3;
+}
+
+message ListCounterResponse {
+  repeated CountersInformation countersInformation= 1;
+}
+
+message CountersInformation {
+    int32 firstCounter = 1;
+    int32 lastCounter = 2;
+    repeated string flights = 3;
+    int32 people = 4;
 }
