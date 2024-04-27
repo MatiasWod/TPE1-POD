@@ -153,9 +153,14 @@ public class Airport {
             if(!airlines.containsKey(airlineName)){
                 throw new IllegalArgumentException();
             }
-            if (!sectors.containsKey(sectorName) || sectors.get(sectorName).getCounters().isEmpty() ||
-                !sectors.get(sectorName).getCounters().get(0).getAirline().equals(airlineName)){
+            if (!sectors.containsKey(sectorName) || sectors.get(sectorName).getCounters().isEmpty()){
                 throw new IllegalArgumentException();
+            }
+            // TODO: Esto es feisimo
+            for (Counter counter: sectors.get(sectorName).getCounters()) {
+                if (counter.getCounterId() == counterFrom && !counter.getAirline().equals(airlineName)) {
+                    throw new IllegalArgumentException();
+                }
             }
             sectors.get(sectorName).freeCounters(counterFrom,airlines.get(airlineName));
         }

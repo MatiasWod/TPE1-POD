@@ -9,6 +9,6 @@ cd ./tpe1-g10-client-2024.1Q/
 
 sh adminClient.sh -DserverAddress=127.0.0.1:50051 -Daction=addSector -Dsector=C
 echo " "
-sh adminClient.sh -DserverAddress=127.0.0.1:50051 -Daction=addCounters -Dsector=C -Dcounters=30
+sh adminClient.sh -DserverAddress=127.0.0.1:50051 -Daction=addCounters -Dsector=C -Dcounters=5
 echo " "
 sh adminClient.sh -DserverAddress=127.0.0.1:50051 -Daction=manifest -DinPath=../manifest.csv

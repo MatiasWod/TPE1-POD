@@ -8,8 +8,9 @@ import java.util.List;
 public enum CounterActions {
     LIST_SECTORS("listSectors", new ListSectorsAction(Collections.emptyList())),
     LIST_COUNTERS("listCounters", new ListCountersAction(List.of("sector","counterFrom","counterTo"))),
-    ASSIGN_COUNTERS("assignCounters", new AsignCountersAction(List.of("sector","flights","airline","counterCount")))/*,
-    FREE_COUNTERS(),
+    ASSIGN_COUNTERS("assignCounters", new AsignCountersAction(List.of("sector","flights","airline","counterCount"))),
+    FREE_COUNTERS("freeCounters", new FreeCountersAction(List.of("sector", "counterFrom", "airline"))),
+    /*
     CHECKIN_COUNTERS(),
     LIST_PENDING_ASSIGNMENTS()*/;
 

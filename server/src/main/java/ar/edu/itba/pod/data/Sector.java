@@ -6,12 +6,13 @@ import org.checkerframework.checker.units.qual.C;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 public class Sector {
     private final String name;
     private final List<Counter> counters = new ArrayList<>();
-    private final BlockingQueue<AirlineCounterRequest> airlineBlockingQueue = new SynchronousQueue<>();
+    private final BlockingQueue<AirlineCounterRequest> airlineBlockingQueue = new LinkedBlockingQueue<>();
 
     public Sector(String name){
         this.name = name;
@@ -55,12 +56,14 @@ public class Sector {
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
             //TODO ASSIGN PENDIENTES
+            System.out.println("Adding wachito to queue");
             airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
+            return;
         }
         addFlightsToCounters(startPosition,counterCount,flights,airline);
     }
 
-    public void freeCounters(int counterFrom, Airline airline){
+    public void freeCounters(int counterFrom, Airline airline) {
         //TODO revisar el método
         for(Counter counter : counters){
             if(counter.getCounterId() >= counterFrom && counter.getAirline().equals(airline.getAirlineName())){
@@ -70,7 +73,10 @@ public class Sector {
         if (!airlineBlockingQueue.isEmpty()) {
             AirlineCounterRequest aux = airlineBlockingQueue.peek();
             int startPosition = getPositionForCountersAssignment(aux.getCountersAmount());
-            addFlightsToCounters(startPosition, counterFrom,aux.getFlights(),aux.getAirline());
+            if (startPosition > 0) {
+                addFlightsToCounters(startPosition, counterFrom,aux.getFlights(),aux.getAirline());
+                airlineBlockingQueue.remove();
+            }
         }
     }
 
@@ -89,8 +95,9 @@ public class Sector {
         int counterContCount = 0;
         for(Counter counter : counters){
             if(counter.isFree()){
-                if(counter.getCounterId() == firstCounterId+1){
+                if(counter.getCounterId() == firstCounterId+counterContCount){
                     counterContCount++;
+
                 } else{
                     firstCounterId = counter.getCounterId();
                     counterContCount=1;
