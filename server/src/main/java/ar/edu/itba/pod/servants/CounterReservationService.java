@@ -62,4 +62,9 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
         responseObserver.onNext(Empty.newBuilder().build());
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void checkInCounters(checkInCountersRequest request, StreamObserver<Empty> responseObserver){
+
+    }
 }

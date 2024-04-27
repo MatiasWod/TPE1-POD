@@ -5,6 +5,7 @@ import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
@@ -12,6 +13,7 @@ import java.util.concurrent.SynchronousQueue;
 public class Sector {
     private final String name;
     private final List<Counter> counters = new ArrayList<>();
+    private final PriorityQueue<Counter> freeCounters = new PriorityQueue<>();
     private final BlockingQueue<AirlineCounterRequest> airlineBlockingQueue = new LinkedBlockingQueue<>();
 
     public Sector(String name){
@@ -20,6 +22,7 @@ public class Sector {
 
     public void addCounter(int counterId){
         counters.add(new Counter(counterId, this));
+        freeCounters.add(new Counter(counterId, this));
     }
 
     public List<Counter> getCounters(){

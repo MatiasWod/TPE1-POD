@@ -147,6 +147,24 @@ public class Airport {
 
     }
 
+    public void checkInCounters(String sectorName, int counterFrom, String airlineName){
+        synchronized (sectorLock){
+            if(!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            // TODO: Esto es feisimo
+            for (Counter counter: sectors.get(sectorName).getCounters()) {
+                if (counter.getCounterId() == counterFrom && !counter.getAirline().equals(airlineName)) {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+
+        }
+    }
+
+
+
     public void freeCounters(String sectorName, int counterFrom, String airlineName){
         synchronized (sectorLock){
             //TODO falta ver si existen pasajeros esperando a ser atendidos en la cola del rango
