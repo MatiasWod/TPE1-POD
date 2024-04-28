@@ -29,9 +29,9 @@ public class CountersAction extends Action {
             );
 
             System.out.printf("Flight %s from %s is now checking in" +
-                            " at counters %s in Sector %s with %d people in line%n",
+                            " at counters (%d-%d) in Sector %s with %d people in line%n",
                     response.getFlightCode(), response.getAirline(),
-                    response.getCounters(), response.getSector(), response.getQueueSize());
+                    response.getFromCounter(), response.getToCounter(), response.getSector(), response.getQueueSize());
         } catch (StatusRuntimeException e) {
             if (e.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();

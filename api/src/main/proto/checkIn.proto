@@ -21,9 +21,10 @@ message Booking {
 message CheckInCountersResponse {
   string flightCode = 1;
   string airline = 2;
-  string counters = 3;
-  string sector = 4;
-  int32 queueSize = 5;
+  int32 fromCounter = 3;
+  int32 toCounter = 4;
+  string sector = 5;
+  int32 queueSize = 6;
 }
 
 // Get in line messages

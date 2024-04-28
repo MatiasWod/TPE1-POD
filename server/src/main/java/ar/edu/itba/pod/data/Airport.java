@@ -1,7 +1,10 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.checkIn.CheckInCountersResponse;
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
+import ar.edu.itba.pod.data.Exceptions.BookingNotFoundException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.data.Utils.PassengerCheckInInfoDTO;
 
 import java.util.*;
 
@@ -185,5 +188,37 @@ public class Airport {
             }
             sectors.get(sectorName).freeCounters(counterFrom, airlines.get(airlineName));
         }
+    }
+
+    public CheckInCountersResponse getPassengerCheckinInfo(String booking) {
+        // A partir de una booking conseguir el vuelo, aerolinea, counters y gente en la cola
+        // TODO: Pasar a parallel run
+        CheckInCountersResponse.Builder pDTO = CheckInCountersResponse.newBuilder();
+        String flightCode = null;
+        for (Airline airline : airlines.values()) {
+            for (Flight flight : airline.getFlights().values()) {
+                for (Passenger passenger: flight.getPassengerList()) {
+                    if (passenger.getBookingCode().equals(booking)) {
+                        flightCode = flight.getFlightCode();
+                    }
+                }
+            }
+        }
+        if (flightCode == null) {
+            throw new BookingNotFoundException();
+        }
+        pDTO.setFlightCode(flightCode);
+        for (Sector sector : getSectors()) {
+            for (Counter counter : sector.getCounters()) {
+                if (counter.isStartOfRange() && counter.containsFlightCode(flightCode)) {
+                    pDTO.setAirline(counter.getAirline());
+                    pDTO.setSector(sector.getName());
+                    pDTO.setQueueSize(counter.getQueueSize());
+                    pDTO.setFromCounter(counter.getCounterId());
+                    pDTO.setToCounter(counter.getCounterId() + counter.getRangeLength() - 1);
+                }
+            }
+        }
+        return pDTO.build();
     }
 }

@@ -5,6 +5,7 @@ import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class Counter {
@@ -78,4 +79,31 @@ public class Counter {
         }
         return toRet;
     }
+
+    public Integer getQueueSize() {
+        return passengerQueue.size();
+    }
+
+    public int getRangeLength() {
+        return rangeLength;
+    }
+
+    public boolean containsFlightCode(String flightCode) {
+        return flights.stream().anyMatch(f -> Objects.equals(f.getFlightCode(), flightCode));
+    }
+
+    /*
+    TODO: Maybe usar esto mas adelante
+    public void checkInCounters(int counterFrom, Airline airline) {
+        PriorityQueue<Counter> pq = new PriorityQueue<>(counters.subList(counterFrom, counters.size()));
+        while (!pq.isEmpty()) {
+            Counter counter = pq.poll();
+            if (counter.getAirline().equals(airline.getAirlineName())) {
+                counter.checkIn();
+            }
+            else {
+                return;
+            }
+        }
+    } */
 }
