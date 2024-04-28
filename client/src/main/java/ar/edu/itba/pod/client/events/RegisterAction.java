@@ -44,12 +44,13 @@ public class RegisterAction extends Action {
                         }
                         break;
                     case PASSENGER_QUEUE_SUCCESS:
-                        System.out.printf("Booking %s for flight %s from %s is now waiting to check-in on counters (%d-%d) in Sector %s with %d people in line\n",
+                        System.out.printf("Booking %s for flight %s from %s is now waiting to check-in on counters (%d-%d) in Sector %s with %d people in line.\n",
                                 response.getBookingCode(), response.getFlights(0), System.getProperty("airline"), response.getFirstCounter(), response.getLastCounter(),
                                 response.getSector(), response.getPendingAhead());
                         break;
                     case CHECKIN_SUCCESS:
-                        System.out.printf("Check-in successful of XYZ345 for flight AA123 at counter 3 in Sector C\n");
+                        System.out.printf("Check-in successful of %s for flight %s at counter %d in Sector %s.\n",
+                                response.getBookingCode(), response.getFlights(0), response.getFirstCounter(), response.getSector());
                         break;
                     case COUNTER_FREED:
                         System.out.printf("Ended check-in for flights ");
