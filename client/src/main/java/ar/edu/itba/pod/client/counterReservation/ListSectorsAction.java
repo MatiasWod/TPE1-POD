@@ -4,9 +4,7 @@ import ar.edu.itba.pod.client.Action;
 import ar.edu.itba.pod.client.ServerUnavailableException;
 import ar.edu.itba.pod.client.Util;
 import ar.edu.itba.pod.commons.Empty;
-import ar.edu.itba.pod.counterReservation.CounterReservation;
-import ar.edu.itba.pod.counterReservation.SectorsInformationResponse;
-import ar.edu.itba.pod.counterReservation.counterReservationServiceGrpc;
+import ar.edu.itba.pod.counterReservation.*;
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -26,10 +24,18 @@ public class ListSectorsAction extends Action {
 
         try{
             SectorsInformationResponse response = stub.listSectors(Empty.newBuilder().build());
-            System.out.println("Sectors         Counters");
+            System.out.println("Sectors\t\tCounters");
             System.out.println("########################");
-            // TODO CORREGIR EL FORMATO
-            response.getSectorsList().forEach(sector -> System.out.println(sector.getName() + "      "  + sector.getCountersList().stream().toList()) );
+            List<Sector> sectorsList = response.getSectorsList();
+            for(Sector sector : sectorsList){
+                System.out.printf("%s\t\t\t",sector.getName());
+                if(!sector.getCountersList().isEmpty()){
+                    printCounters(sector.getCountersList());
+                }else{
+                    System.out.println("-");
+                }
+
+            }
         }
         catch(StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
@@ -56,4 +62,18 @@ public class ListSectorsAction extends Action {
                 """;
     }
 
+
+    private void printCounters(List<Counter> countersList){
+        int lastCounterId = countersList.get(0).getCounterId();
+        System.out.printf("(%d-",lastCounterId);
+        for(Counter counter : countersList){
+            if(counter.getCounterId() != lastCounterId+1 && counter.getCounterId() != lastCounterId){
+                System.out.printf("%d)(%d-",lastCounterId,counter.getCounterId());
+                lastCounterId = counter.getCounterId();
+            }else{
+                lastCounterId = counter.getCounterId();
+            }
+        }
+        System.out.printf("%d)\n",lastCounterId);
+    }
 }

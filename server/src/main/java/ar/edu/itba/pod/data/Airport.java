@@ -48,18 +48,20 @@ public class Airport {
         }
     }
 
-    public void addCounters(String sectorName, int counterCount){
+    public int addCounters(String sectorName, int counterCount){
         synchronized (sectorLock){
             if (!sectors.containsKey(sectorName) || counterCount <= COUNTERS_INCORRECT_COUNT){
                 throw new IllegalArgumentException();
             }
             //TE CAMBIE EL CODIGO CANE NO SE SI TIENE SENTIDO
+            int firstCounter = globalCounterNumber;
             while(counterCount > 0){
                 Sector sector = sectors.get(sectorName);
                 sector.addCounter(globalCounterNumber);
                 counterCount--;
                 globalCounterNumber++;
             }
+            return firstCounter;
             /*
             for(; counterCount > COUNTERS_INCORRECT_COUNT; globalCounterNumber++) {
                 sectors.get(sectorName).add(new Counter(globalCounterNumber));

@@ -9,7 +9,7 @@ option java_multiple_files = true;
 
 service AdminService{
   rpc addSector(SectorRequest) returns (commons.Empty);
-  rpc addCounters(CountersRequest) returns (commons.Empty);
+  rpc addCounters(CountersRequest) returns (AddCountersResponse);
   rpc loadPassengerSet(PassengerRequest) returns (commons.Empty);
 }
 
@@ -26,4 +26,8 @@ message PassengerRequest{
   string bookingCode = 1;
   string flightCode = 2;
   string airlineName = 3;
+}
+
+message AddCountersResponse{
+  int32 firstCounter = 1;
 }

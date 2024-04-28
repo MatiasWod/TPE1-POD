@@ -37,10 +37,12 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
                         counterRange -> {
                             CountersInformation.Builder countersInformationBuilder = CountersInformation.newBuilder()
                                     .setFirstCounter(counterRange.getFirstCounter().getCounterId())
-                                    .setLastCounter(counterRange.getLastCounterId());
+                                    .setLastCounter(counterRange.getLastCounterId())
+                                    .setAirline(counterRange.getAirline());
+                            int index = 0;
                             counterRange.getFirstCounter().getFlights().forEach(flight -> {
                                 if (flight != null) {
-                                    countersInformationBuilder.addFlights(flight.getFlightCode());
+                                    countersInformationBuilder.setFlights(index, flight.getFlightCode());
                                 }
                             });
                             countersInformationBuilder.setPeople(780556); //TODO PONER ESTO

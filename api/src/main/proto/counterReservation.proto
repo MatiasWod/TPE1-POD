@@ -42,8 +42,9 @@ message ListCounterResponse {
 message CountersInformation {
     int32 firstCounter = 1;
     int32 lastCounter = 2;
-    repeated string flights = 3;
-    int32 people = 4;
+    string airline = 3;
+    repeated string flights = 4;
+    int32 people = 5;
 }
 
 message AssignCountersRequest {

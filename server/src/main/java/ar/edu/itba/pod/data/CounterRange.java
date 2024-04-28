@@ -24,4 +24,8 @@ public class CounterRange {
     public int getLastCounterId() {
         return lastCounterId;
     }
+
+    public String getAirline() {
+        return firstCounter.getAirline();
+    }
 }
