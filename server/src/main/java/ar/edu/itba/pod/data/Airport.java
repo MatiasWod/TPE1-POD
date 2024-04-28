@@ -321,4 +321,11 @@ public class Airport {
         }
         airlines.get(airline).unregisterForEvents();
     }
+
+    public void notifyAirline(String airline, EventsResponse event){
+        if(!airlines.containsKey(airline)){
+            throw new AirlineNotFoundException();
+        }
+        airlines.get(airline).notifyEvent(event);
+    }
 }
