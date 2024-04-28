@@ -1,15 +1,25 @@
 package ar.edu.itba.pod.data;
 
+
+import ar.edu.itba.pod.data.Exceptions.AirlineAlreadyRegisteredForEventsException;
+import ar.edu.itba.pod.data.Exceptions.AirlineNotRegisteredException;
+import ar.edu.itba.pod.events.EventStatus;
+import ar.edu.itba.pod.events.EventsResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 public class Airline {
     private final String airlineName;
     private final Map<String, Flight> flights = new HashMap<>();
     private List<Integer> countersId= new ArrayList<>();
+    private BlockingQueue<EventsResponse> eventsQueue = null;
+    private Object eventsLock = "eventsLock";
 
     public Airline(String airlineName) {
         this.airlineName = airlineName;
@@ -40,5 +50,28 @@ public class Airline {
 
     public String getAirlineName() {
         return airlineName;
+    }
+
+    public void notifyEvent(EventsResponse eventResponse){
+        if(eventsQueue != null){
+            eventsQueue.add(eventResponse);
+        }
+    }
+
+    public BlockingQueue<EventsResponse> registerForEvents(){
+        if(eventsQueue != null){
+            throw new AirlineAlreadyRegisteredForEventsException();
+        }
+        eventsQueue = new LinkedBlockingQueue<>();
+        return eventsQueue;
+    }
+
+    public void unregisterForEvents(){
+        if(eventsQueue == null){
+            throw new AirlineNotRegisteredException();
+        }
+        EventsResponse.Builder eventsResponse = EventsResponse.newBuilder().setStatus(EventStatus.DESTROYED);
+        eventsQueue.add(eventsResponse.build());
+        eventsQueue = null;
     }
 }

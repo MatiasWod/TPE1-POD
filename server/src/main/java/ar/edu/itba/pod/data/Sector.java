@@ -7,6 +7,8 @@ import ar.edu.itba.pod.data.Exceptions.AirlineNotMatchesCounterRangeException;
 import ar.edu.itba.pod.data.Exceptions.NotRangeAssignedException;
 import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.events.EventStatus;
+import ar.edu.itba.pod.events.EventsResponse;
 import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
@@ -67,7 +69,17 @@ public class Sector {
             //TODO faltan agregar los flights, por eso no se imprimen despues
             System.out.println("Adding wachito to queue");
             airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
-            return AssignCountersResponse.newBuilder().setFirstPosition(-1).setPendingAhead(airlineBlockingQueue.size()).build();
+
+            //Notify the airline
+            EventsResponse.Builder eventsResponseBuilder = EventsResponse.newBuilder().setStatus(EventStatus.COUNTER_ASSIGNMENT_PENDING)
+                    .setCounterCount(counterCount).setSector(name).setPendingAhead(airlineBlockingQueue.size()-1);
+            flights.forEach(flight -> {
+                if (flight!=null){
+                    eventsResponseBuilder.addFlights(flight);
+                }});
+            airline.notifyEvent(eventsResponseBuilder.build());
+
+            return AssignCountersResponse.newBuilder().setFirstPosition(-1).setPendingAhead(airlineBlockingQueue.size()-1).build();
         }
         addFlightsToCounters(startPosition,counterCount,flights,airline);
         return AssignCountersResponse.newBuilder().setFirstPosition(startPosition).setPendingAhead(-1).build();
@@ -98,17 +110,50 @@ public class Sector {
 
     public void freeCounters(int counterFrom, Airline airline) {
         //TODO revisar el método
+        int freedAmount = 0;
+        List<Flight> flights = new ArrayList<>();
+
         for(Counter counter : counters){
             if(counter.getCounterId() >= counterFrom && counter.getAirline().equals(airline.getAirlineName())){
                 counter.freeCounter();
+                freedAmount++;
+                flights = counter.getFlights();
             }
         }
-        if (!airlineBlockingQueue.isEmpty()) {
-            AirlineCounterRequest aux = airlineBlockingQueue.peek();
-            int startPosition = getPositionForCountersAssignment(aux.getCountersAmount());
-            if (startPosition > 0) {
-                addFlightsToCounters(startPosition, counterFrom,aux.getFlights(),aux.getAirline());
-                airlineBlockingQueue.remove();
+
+        if(freedAmount != 0){
+            //Notify the airline
+            EventsResponse.Builder eventsResponseBuilder = EventsResponse.newBuilder().setStatus(EventStatus.COUNTER_FREED).setSector(name)
+                    .setFirstCounter(counterFrom).setLastCounter(counterFrom+freedAmount-1);
+            flights.forEach(flight -> {
+                if (flight!=null){
+                    eventsResponseBuilder.addFlights(flight.getFlightCode());
+                }});
+            airline.notifyEvent(eventsResponseBuilder.build());
+
+
+            // Checks if the next one from the queue can be assigned
+            if (!airlineBlockingQueue.isEmpty()) {
+                AirlineCounterRequest aux = airlineBlockingQueue.peek();
+                int startPosition = getPositionForCountersAssignment(aux.getCountersAmount());
+                if (startPosition > 0) {
+                    addFlightsToCounters(startPosition, counterFrom,aux.getFlights(),aux.getAirline());
+                    airlineBlockingQueue.remove();
+
+                    //7 counters in Sector C for flights AA888|AA999 is pending with 4 other pendings ahead
+                    int airlinesAhead = 0;
+                    for(AirlineCounterRequest airlineRequest : airlineBlockingQueue){
+                        //Notify the airlines
+                        EventsResponse.Builder eventsResponseBuilder2 = EventsResponse.newBuilder().setStatus(EventStatus.COUNTER_ASSIGNMENT_PENDING_CHANGE)
+                                .setCounterCount(airlineRequest.getCountersAmount()).setSector(name).setPendingAhead(airlinesAhead);
+                        airlineRequest.getFlights().forEach(flight -> {
+                            if (flight!=null){
+                                eventsResponseBuilder2.addFlights(flight);
+                            }});
+                        airline.notifyEvent(eventsResponseBuilder2.build());
+                        airlinesAhead++;
+                    }
+                }
             }
         }
     }
@@ -124,6 +169,14 @@ public class Sector {
                 }
             }
         }
+        //Notify the airline
+        EventsResponse.Builder eventsResponseBuilder = EventsResponse.newBuilder().setStatus(EventStatus.COUNTER_ASSIGNMENT_SUCCESS).setCounterCount(counterCount)
+                .setFirstCounter(startPosition).setLastCounter(startPosition+counterCount-1).setSector(name);
+        flights.forEach(flight -> {
+            if (flight!=null){
+                eventsResponseBuilder.addFlights(flight);
+            }});
+        airline.notifyEvent(eventsResponseBuilder.build());
     }
 
 

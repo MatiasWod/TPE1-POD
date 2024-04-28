@@ -4,6 +4,8 @@ import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.data.Exceptions.PassengerQueueNotEmptyException;
 import ar.edu.itba.pod.data.Exceptions.StillPassengersInLineException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.events.EventStatus;
+import ar.edu.itba.pod.events.EventsResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
 
 public class Counter {
     private final int counterId;
@@ -98,6 +101,14 @@ public class Counter {
                 passenger.setStatus(PassengerStatus.CHECKED_IN);
                 passenger.setCheckedInAtCounter(cId);
                 passengerData.setPassenger(passenger);
+
+                //Notify the airline
+                Airport airport = Airport.getInstance();
+                EventsResponse eventsResponse = EventsResponse.newBuilder().setStatus(EventStatus.CHECKIN_SUCCESS)
+                        .setBookingCode(passenger.getBookingCode()).addFlights(passenger.getFlightCode()).setFirstCounter(counterId)
+                        .setSector(passenger.getSector()).build();
+                airport.notifyAirline(passenger.getAirlineCode(), eventsResponse);
+
             }else {
                 passengerData.setEmpty(true);
             }
@@ -140,6 +151,15 @@ public class Counter {
     public int addPassengerToQueue(Passenger passenger) {
         passengerQueue.add(passenger);
         passenger.setStatus(PassengerStatus.ON_QUEUE);
+
+        //Notify the airline
+        Airport airport = Airport.getInstance();
+        EventsResponse.Builder eventsResponseBuilder = EventsResponse.newBuilder().setStatus(EventStatus.PASSENGER_QUEUE_SUCCESS)
+                .setBookingCode(passenger.getBookingCode()).addFlights(passenger.getFlightCode()).setPendingAhead(passengerQueue.size() - 1)
+                .setSector(passenger.getSector()).setFirstCounter(passenger.getCounterFrom().getCounterId())
+                .setLastCounter(passenger.getCounterFrom().getRangeLength()+passenger.getCounterFrom().getCounterId()-1);
+        airport.notifyAirline(passenger.getAirlineCode(), eventsResponseBuilder.build());
+
         return passengerQueue.size() - 1;
     }
 
