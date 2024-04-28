@@ -47,15 +47,8 @@ public class EventsService extends EventsServiceGrpc.EventsServiceImplBase {
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
-        catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException();
+        catch (IllegalArgumentException | AirlineNotFoundException e) {
+            throw new IllegalArgumentException(e);
         }
-        catch (AirlineNotFoundException e) {
-            throw new IllegalArgumentException();
-        }
-
     }
-
-
-
 }

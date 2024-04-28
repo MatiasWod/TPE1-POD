@@ -74,14 +74,15 @@ public class RegisterAction extends Action {
 
         }
 
-        /*
-        Iterator<NotificationResponse> responseIterator = stub.followBooking(request);
-            while (responseIterator.hasNext()) {
-                NotificationResponse response = responseIterator.next();
-                System.out.println(NotificationStatus.valueOf(response.getStatus().name()).consumeNotification(response));
-            }
-         */
         catch (StatusRuntimeException exception){
+            if (exception.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
+            if (exception.getStatus().getCode() == Status.NOT_FOUND.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
                 throw new IllegalArgumentException();
             } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {

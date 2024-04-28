@@ -42,7 +42,9 @@ public class GlobalExceptionHandlerInterceptor implements ServerInterceptor {
             Map.entry(SectorNotFoundException.class, Code.NOT_FOUND),
             Map.entry(CounterCountShouldBePositiveException.class, Code.FAILED_PRECONDITION),
             Map.entry(FlightCodeAlreadyExistsInOtherAirlineException.class, Code.ALREADY_EXISTS),
-            Map.entry(PassengerAlreadyExistsException.class, Code.FAILED_PRECONDITION)
+            Map.entry(PassengerAlreadyExistsException.class, Code.FAILED_PRECONDITION),
+            Map.entry(AirlineAlreadyRegisteredForEventsException.class, Code.ALREADY_EXISTS),
+            Map.entry(AirlineNotFoundException.class, Code.NOT_FOUND)
         );
 
         private void handleException(RuntimeException exception, ServerCall<T, R> serverCall, Metadata headers) {
