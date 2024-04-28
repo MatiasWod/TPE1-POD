@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.client.admin;
 
+import ar.edu.itba.pod.admin.AddCountersResponse;
 import ar.edu.itba.pod.admin.AdminServiceGrpc;
 import ar.edu.itba.pod.admin.CountersRequest;
 import ar.edu.itba.pod.client.Action;
@@ -22,14 +23,17 @@ public class CountersAction extends Action {
         AdminServiceGrpc.AdminServiceBlockingStub stub = AdminServiceGrpc.newBlockingStub(channel);
 
         try{
+
             CountersRequest countersRequest = CountersRequest
                     .newBuilder()
                     .setSectorName(System.getProperty("sector"))
                     .setCounters(Integer.parseInt(System.getProperty("counters")))
                     .build();
-            stub.addCounters(countersRequest);
+            AddCountersResponse response = stub.addCounters(countersRequest);
+
             //TODO completar bien el print
-            System.out.printf("%d new counters (n-n) in Sector %s added successfully\n",Integer.parseInt(System.getProperty("counters")),System.getProperty("sector"));
+            System.out.printf("%d new counters (%d-%d) in Sector %s added successfully\n",Integer.parseInt(System.getProperty("counters")),
+                    response.getFirstCounter(), response.getFirstCounter()+Integer.parseInt(System.getProperty("counters"))-1,System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){

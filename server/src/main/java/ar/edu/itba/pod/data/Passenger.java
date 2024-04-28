@@ -8,6 +8,9 @@ public class Passenger {
     private String bookingCode;
     private String flightCode;
     private String airlineCode;
+    private String sector;
+    private Counter counterFrom;
+    private int checkedInAtCounter;
     private PassengerStatus status;
 
     public Passenger(String bookingCode, String flightCode, String airlineCode, PassengerStatus status) {
@@ -42,11 +45,36 @@ public class Passenger {
         return airlineCode;
     }
 
+
     public PassengerStatus getStatus() {
         return status;
     }
 
     public void setStatus(PassengerStatus status) {
         this.status = status;
+    }
+
+    public String getSector() {
+        return sector;
+    }
+
+    public int getCheckedInAtCounter() {
+        return checkedInAtCounter;
+    }
+
+    public void setCheckedInAtCounter(int checkedInAtCounter) {
+        this.checkedInAtCounter = checkedInAtCounter;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
+    }
+
+    public Counter getCounterFrom() {
+        return counterFrom;
+    }
+
+    public void setCounterFrom(Counter counterFrom) {
+        this.counterFrom = counterFrom;
     }
 }

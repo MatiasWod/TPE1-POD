@@ -116,11 +116,11 @@ public class Sector {
     private void addFlightsToCounters(int startPosition, int counterCount, List<String> flights, Airline airline){
         for(Counter counter : counters){
             if(counter.getCounterId() >= startPosition && counter.getCounterId() < startPosition + counterCount){
-                for(String flight : flights){
-                    counter.addFlight(airline.getFlight(flight));
-                }
                 if (counter.getCounterId() == startPosition) {
                     counter.assignStartOfRange(counterCount);
+                }
+                for(String flight : flights){
+                    counter.addFlight(airline.getFlight(flight));
                 }
             }
         }

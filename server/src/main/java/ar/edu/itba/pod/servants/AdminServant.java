@@ -1,9 +1,6 @@
 package ar.edu.itba.pod.servants;
 
-import ar.edu.itba.pod.admin.AdminServiceGrpc;
-import ar.edu.itba.pod.admin.CountersRequest;
-import ar.edu.itba.pod.admin.PassengerRequest;
-import ar.edu.itba.pod.admin.SectorRequest;
+import ar.edu.itba.pod.admin.*;
 import ar.edu.itba.pod.commons.Empty;
 import ar.edu.itba.pod.data.Airport;
 import io.grpc.Status;
@@ -27,13 +24,15 @@ public class AdminServant extends AdminServiceGrpc.AdminServiceImplBase {
     }
 
     @Override
-    public void addCounters(CountersRequest request, StreamObserver<Empty> responseObserver) {
+    public void addCounters(CountersRequest request, StreamObserver<AddCountersResponse> responseObserver) {
         try{
-            airport.addCounters(
-                    request.getSectorName(),
-                    request.getCounters()
-            );
-            responseObserver.onNext(Empty.newBuilder().build());
+            AddCountersResponse response = AddCountersResponse.newBuilder().setFirstCounter(
+                    airport.addCounters(
+                            request.getSectorName(),
+                            request.getCounters()
+                    )
+            ).build();
+            responseObserver.onNext(response);
             responseObserver.onCompleted();
         }
         catch (IllegalArgumentException exception){

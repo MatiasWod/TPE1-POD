@@ -48,19 +48,19 @@ message GetInlineResponse {
 
 // Passenger status messages
 enum PassengerStatus {
-  newBorn = 0;
-  onQueue = 1;
-  checkedIn = 2;
+  NEW_BORN = 0;
+  COUNTER_ASSIGNED = 1;
+  ON_QUEUE = 2;
+  CHECKED_IN = 3;
 }
 
 message GetPassengerStatusResponse {
   string sector = 1;
-  string counters = 2;
-  string counter = 3;
+  int32 counter = 3;
+  int32 counter_range = 2;
   int32 queueSize = 4;
   string flightCode = 5;
   PassengerStatus status = 6;
   string airline = 7;
-  string checkInCounter = 8;
 }
 

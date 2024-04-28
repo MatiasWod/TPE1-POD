@@ -2,6 +2,7 @@ package ar.edu.itba.pod.data;
 
 import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.data.Exceptions.PassengerQueueNotEmptyException;
+import ar.edu.itba.pod.data.Exceptions.StillPassengersInLineException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 
 import java.util.ArrayList;
@@ -38,14 +39,26 @@ public class Counter {
 
     public void addFlight(Flight flight){
         flights.add(flight);
+        if (startOfRange) {
+            for (Passenger passenger : flight.getPassengerList()) {
+                passenger.setStatus(PassengerStatus.COUNTER_ASSIGNED);
+                passenger.setSector(sector.getName());
+                passenger.setCounterFrom(this);
+            }
+        }
     }
 
     public void freeCounter(){
         if (!passengerQueue.isEmpty()) {
             throw new PassengerQueueNotEmptyException();
         }
-
         if (startOfRange) {
+            // Aca se puede chequear si quedaban pasajeros en la fila
+            for (Flight flight : flights) {
+                if (!flight.getPassengerList().isEmpty()) {
+                    throw new StillPassengersInLineException();
+                }
+            }
             startOfRange = false;
             passengerQueue = null;
             rangeLength = 0;
@@ -56,7 +69,7 @@ public class Counter {
 
     public String getAirline(){
         if(flights.isEmpty()){
-            return "d6de3e17fe2d2a40de4f6a836f84f519c9c5db8261b5e284bcde5b8dd3d1ea69";
+            return "-";
         }
         return flights.get(0).getAirlineName();
     }
@@ -82,8 +95,9 @@ public class Counter {
             CheckInCountersDTO passengerData = new CheckInCountersDTO(cId);
 
             if (passenger != null) {
+                passenger.setStatus(PassengerStatus.CHECKED_IN);
+                passenger.setCheckedInAtCounter(cId);
                 passengerData.setPassenger(passenger);
-                passenger.setStatus(PassengerStatus.checkedIn);
             }else {
                 passengerData.setEmpty(true);
             }
@@ -95,6 +109,17 @@ public class Counter {
 
     public Integer getQueueSize() {
         return passengerQueue.size();
+    }
+
+    public int getPeopleInFront(Passenger passenger) {
+        int peopleInLine = 0;
+        for (Passenger pass : passengerQueue) {
+            if (pass.equals(passenger)) {
+                break;
+            }
+            peopleInLine++;
+        }
+        return peopleInLine;
     }
 
     public int getRangeLength() {
@@ -111,6 +136,7 @@ public class Counter {
 
     public int addPassengerToQueue(Passenger passenger) {
         passengerQueue.add(passenger);
+        passenger.setStatus(PassengerStatus.ON_QUEUE);
         return passengerQueue.size() - 1;
     }
 
