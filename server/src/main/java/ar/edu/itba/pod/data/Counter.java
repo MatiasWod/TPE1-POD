@@ -54,7 +54,7 @@ public class Counter {
 
     public String getAirline(){
         if(flights.isEmpty()){
-            return "d6de3e17fe2d2a40de4f6a836f84f519c9c5db8261b5e284bcde5b8dd3d1ea69";
+            return "-";
         }
         return flights.get(0).getAirlineName();
     }

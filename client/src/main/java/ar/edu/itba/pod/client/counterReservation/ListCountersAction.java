@@ -28,12 +28,12 @@ public class ListCountersAction extends Action {
                     .setCounterStart(Integer.parseInt(System.getProperty("counterFrom")))
                     .setCounterEnd(Integer.parseInt(System.getProperty("counterTo")))
                     .build());
-            System.out.println("Sectors\t\tCounters");
-            System.out.println("########################");
+            System.out.println("Sectors\t\tCounters\t\tAirlines\t\t\tFlights\t\t\t\tPeople");
+            System.out.println("############################################################################################");
 
             List<CountersInformation> countersInformation = response.getCountersInformationList();
             for(CountersInformation counter : countersInformation){
-                System.out.printf("(%d-%d)\t%s\t",counter.getFirstCounter(), counter.getLastCounter(), counter.getAirline());
+                System.out.printf("(%d-%d)\t\t\t%s\t\t\t",counter.getFirstCounter(), counter.getLastCounter(), counter.getAirline());
                 if(!counter.getFlightsList().isEmpty()){
                     for(String flight : counter.getFlightsList()){
                         System.out.printf("%s|", flight);
@@ -41,7 +41,7 @@ public class ListCountersAction extends Action {
                 }else{
                     System.out.printf("-\t");
                 }
-                System.out.printf("%d\n",counter.getPeople());
+                System.out.printf("\t\t\t\t\t\t\t\t%d\n",counter.getPeople());
             }
 
             }
