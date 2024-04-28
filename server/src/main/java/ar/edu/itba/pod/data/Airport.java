@@ -4,6 +4,8 @@ import ar.edu.itba.pod.checkIn.CheckInCountersResponse;
 import ar.edu.itba.pod.checkIn.GetInlineResponse;
 import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
+import ar.edu.itba.pod.counterReservation.ListPendingAssignmentsResponse;
+import ar.edu.itba.pod.counterReservation.PendingAssignmentsInformation;
 import ar.edu.itba.pod.data.Exceptions.*;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 
@@ -254,5 +256,14 @@ public class Airport {
                 .setSector(sectorName)
                 .build();
 
+    }
+
+    public ListPendingAssignmentsResponse listPendingAssignments(String sectorName){
+        synchronized (sectorLock){
+            if (!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            return sectors.get(sectorName).getPendingAssignments();
+        }
     }
 }

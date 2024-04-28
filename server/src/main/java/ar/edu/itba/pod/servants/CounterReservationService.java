@@ -75,4 +75,11 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
                 .setIsOk(true).setCounterId(1).setBooking("LALALA").setFlight("EL_VUELO").build());
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void listPendingAssignments(ListPendingAssignmentsRequest request, StreamObserver<ListPendingAssignmentsResponse> responseObserver) {
+        ListPendingAssignmentsResponse response = airport.listPendingAssignments(request.getSectorName());
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }

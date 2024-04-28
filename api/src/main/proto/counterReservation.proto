@@ -13,6 +13,7 @@ service counterReservationService{
   rpc assignCounters(AssignCountersRequest) returns (AssignCountersResponse);
   rpc freeCounters(FreeCountersRequest) returns (commons.Empty);
   rpc checkInCounters(CheckInCountersRequest) returns (CheckInCountersOk);
+  rpc listPendingAssignments(ListPendingAssignmentsRequest) returns (ListPendingAssignmentsResponse);
 }
 
 message Counter {
@@ -80,4 +81,18 @@ message FreeCountersRequest{
     string sectorName = 1;
     int32 counterFrom = 2;
     string airlineName = 3;
+}
+
+message ListPendingAssignmentsRequest{
+  string sectorName = 1;
+}
+
+message ListPendingAssignmentsResponse{
+  repeated PendingAssignmentsInformation pendingAssignmentsInformation = 1;
+}
+
+message PendingAssignmentsInformation{
+  int32 counter = 1;
+  string airlineName = 2;
+  repeated string flightCode = 3;
 }

@@ -1,6 +1,8 @@
 package ar.edu.itba.pod.data;
 
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
+import ar.edu.itba.pod.counterReservation.ListPendingAssignmentsResponse;
+import ar.edu.itba.pod.counterReservation.PendingAssignmentsInformation;
 import ar.edu.itba.pod.data.Exceptions.AirlineNotMatchesCounterRangeException;
 import ar.edu.itba.pod.data.Exceptions.NotRangeAssignedException;
 import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
@@ -62,6 +64,7 @@ public class Sector {
     public AssignCountersResponse assignCounters(int counterCount, Airline airline, List<String> flights){
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
+            //TODO faltan agregar los flights, por eso no se imprimen despues
             System.out.println("Adding wachito to queue");
             airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
             return AssignCountersResponse.newBuilder().setFirstPosition(-1).setPendingAhead(airlineBlockingQueue.size()).build();
@@ -139,4 +142,26 @@ public class Sector {
         }
         return Collections.emptyList();
     }
+
+    //TODO REVISAR QUÉ TAN BIEN ESTÁ ESTO
+    public ListPendingAssignmentsResponse getPendingAssignments(){
+        List<AirlineCounterRequest> aux = airlineBlockingQueue.stream().sorted().toList();
+        List<PendingAssignmentsInformation> pendingAssignmentsInformationList = new ArrayList<>();
+        int i = 0;
+        for (AirlineCounterRequest acr : aux){
+            for (String f :acr.getFlights()) {
+                pendingAssignmentsInformationList.add(PendingAssignmentsInformation.newBuilder()
+                        .setAirlineName(acr.getAirline().getAirlineName())
+                        .setCounter(acr.getCountersAmount())
+                        .setFlightCode(i,f)
+                        .build());
+                i++;
+            }
+            i = 0;
+        }
+        return ListPendingAssignmentsResponse.newBuilder()
+                .addAllPendingAssignmentsInformation(pendingAssignmentsInformationList)
+                .build();
+    }
+
 }
