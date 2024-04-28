@@ -42,13 +42,11 @@ public class Counter {
         if (!passengerQueue.isEmpty()) {
             throw new PassengerQueueNotEmptyException();
         }
-
         if (startOfRange) {
             startOfRange = false;
             passengerQueue = null;
             rangeLength = 0;
         }
-
         flights.clear();
     }
 
