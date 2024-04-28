@@ -27,25 +27,27 @@ public class GetPassengerStatusAction extends Action {
                             .build()
             );
             switch (response.getStatus()) {
-                case newBorn: {
-                    System.out.printf("Booking %s for flight %s from %s can check-in" +
-                                    "on counters %s in Sector %s%n",
+                case COUNTER_ASSIGNED: {
+                    System.out.printf("Booking %s for flight %s from %s can check-in " +
+                                    "on counters (%d-%d) in Sector %s%n",
                             booking, response.getFlightCode(),
-                            response.getAirline(), response.getCounters(), response.getSector());
+                            response.getAirline(), response.getCounter(), response.getCounter() + response.getCounterRange() - 1
+                            , response.getSector());
                     break;
                 }
-                case onQueue: {
-                    System.out.printf("Booking %s for flight %s from %s is now waiting to check-in" +
-                                    "on counters %s in Sector %s with %d people in line%n",
+                case ON_QUEUE: {
+                    System.out.printf("Booking %s for flight %s from %s is now waiting to check-in " +
+                                    "on counters (%d-%d) in Sector %s with %d people in line%n",
                             booking, response.getFlightCode(),
-                            response.getAirline(),response.getCounters(), response.getSector(), response.getQueueSize());
+                            response.getAirline(), response.getCounter(),
+                            response.getCounter() + response.getCounterRange() - 1, response.getSector(), response.getQueueSize());
                     break;
                 }
-                case checkedIn: {
-                    System.out.printf("Booking %s for flight %s from %s checked in" +
-                                    "at counter %s in Sector %s%n",
+                case CHECKED_IN: {
+                    System.out.printf("Booking %s for flight %s from %s checked in " +
+                                    "at counter %d in Sector %s%n",
                             booking, response.getFlightCode(),
-                            response.getAirline(), response.getCheckInCounter(), response.getSector());
+                            response.getAirline(), response.getCounter(), response.getSector());
                 }
             }
         } catch (StatusRuntimeException e) {

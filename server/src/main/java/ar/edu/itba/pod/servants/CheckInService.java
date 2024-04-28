@@ -9,7 +9,6 @@ public class CheckInService extends CheckInServiceGrpc.CheckInServiceImplBase {
     private final Airport airport = Airport.getInstance();
     @Override
     public void getCheckInCounters(Booking request, StreamObserver<CheckInCountersResponse> responseObserver) {
-        // TODO: Fetch data using request information
         CheckInCountersResponse response = airport.getPassengerCheckinInfo(request.getCode());
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -17,7 +16,6 @@ public class CheckInService extends CheckInServiceGrpc.CheckInServiceImplBase {
 
     @Override
     public void getInLine(GetInlineRequest request, StreamObserver<GetInlineResponse> responseObserver) {
-        // TODO: Call fucking service dude
         GetInlineResponse response = airport.getPassengerInLine(request.getBooking(), request.getSectorName(), request.getCounterNumber());
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -26,15 +24,7 @@ public class CheckInService extends CheckInServiceGrpc.CheckInServiceImplBase {
     @Override
     public void getPassengerStatus(Booking request, StreamObserver<GetPassengerStatusResponse> responseObserver) {
         // TODO: Call fucking service dude
-        System.out.println(request.getCode());
-
-        GetPassengerStatusResponse response = GetPassengerStatusResponse.newBuilder()
-                .setCounters("[3-4]")
-                .setSector("C")
-                .setQueueSize(7)
-                .setStatus(PassengerStatus.onQueue)
-                .build();
-
+        GetPassengerStatusResponse response = airport.getPassengerStatus(request.getCode());
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
