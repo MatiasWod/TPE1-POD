@@ -12,7 +12,7 @@ service counterReservationService{
   rpc listCounters(ListCounterRequest) returns (ListCounterResponse);
   rpc assignCounters(AssignCountersRequest) returns (AssignCountersResponse);
   rpc freeCounters(FreeCountersRequest) returns (commons.Empty);
-  rpc checkInCounters(checkInCountersRequest) returns (commons.Empty);
+  rpc checkInCounters(CheckInCountersRequest) returns (CheckInCountersOk);
 }
 
 message Counter {
@@ -52,10 +52,17 @@ message AssignCountersRequest {
     int32 counterCount = 4;
 }
 
-message checkInCountersRequest {
+message CheckInCountersRequest {
   string sectorName  = 1;
   int32 fromVal = 2;
   string airlineName = 3;
+}
+
+message CheckInCountersOk {
+  bool isOk = 1;
+  string booking = 2; // TODO: Booking + CounterId should be repeated
+  int32 counterId = 3;
+  string flight = 4;
 }
 
 message AssignCountersResponse{

@@ -5,9 +5,11 @@ import ar.edu.itba.pod.checkIn.CheckInCountersResponse;
 import ar.edu.itba.pod.commons.Empty;
 import ar.edu.itba.pod.counterReservation.*;
 import ar.edu.itba.pod.data.Airport;
+import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CounterReservationService extends counterReservationServiceGrpc.counterReservationServiceImplBase  {
@@ -64,7 +66,12 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
     }
 
     @Override
-    public void checkInCounters(checkInCountersRequest request, StreamObserver<Empty> responseObserver){
+    public void checkInCounters(CheckInCountersRequest request, StreamObserver<CheckInCountersOk> responseObserver){
+        List<CheckInCountersDTO> checkInCountersDTOS = airport.checkInCounters(request.getSectorName(), request.getFromVal(), request.getAirlineName());
 
+
+        responseObserver.onNext(CheckInCountersOk.newBuilder()
+                .setIsOk(true).setCounterId(1).setBooking("LALALA").setFlight("EL_VUELO").build());
+        responseObserver.onCompleted();
     }
 }

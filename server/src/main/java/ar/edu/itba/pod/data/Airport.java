@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.data;
 
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
+import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 
 import java.util.*;
 
@@ -149,7 +150,7 @@ public class Airport {
 
     }
 
-    public void checkInCounters(String sectorName, int counterFrom, String airlineName){
+    public List<CheckInCountersDTO> checkInCounters(String sectorName, int counterFrom, String airlineName){
         synchronized (sectorLock){
             if(!sectors.containsKey(sectorName)){
                 throw new IllegalArgumentException();
@@ -160,8 +161,8 @@ public class Airport {
                     throw new IllegalArgumentException();
                 }
             }
-
-
+            // Esto se mete en el sector y consume la cola adecuada
+            return sectors.get(sectorName).checkInCounters(counterFrom, airlines.get(airlineName));
         }
     }
 
@@ -182,7 +183,7 @@ public class Airport {
                     throw new IllegalArgumentException();
                 }
             }
-            sectors.get(sectorName).freeCounters(counterFrom,airlines.get(airlineName));
+            sectors.get(sectorName).freeCounters(counterFrom, airlines.get(airlineName));
         }
     }
 }

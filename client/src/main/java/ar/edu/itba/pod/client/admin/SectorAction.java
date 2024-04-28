@@ -28,7 +28,7 @@ public class SectorAction extends Action {
                     .build();
             stub.addSector(sectorRequest);
             // TODO: Handle excpetion when sector already exixts :D
-            System.out.printf("Sector %s added successfully", System.getProperty("sector"));
+            System.out.printf("Sector %s added successfully\n", System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){

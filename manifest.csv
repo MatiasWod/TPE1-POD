@@ -1,7 +1,6 @@
 booking;flight;airline
 abc456;qf456;qantasairways
 def789;ek789;emirates
-ghi012;aa012;americanairlines
 jkl345;lh345;lufthansa
 mno678;tk678;turkishairlines
 pqr901;af901;airfrance
@@ -13,3 +12,8 @@ efg456;fi456;icelandair
 123xyz;sw123;swissinternationalairlines
 456abc;ba456;britishairways
 789def;dl789;deltaairlines
+ghi011;aa012;americanairlines
+ghi012;aa012;americanairlines
+ghi013;aa012;americanairlines
+ghi014;aa012;americanairlines
+ghi015;aa012;americanairlines

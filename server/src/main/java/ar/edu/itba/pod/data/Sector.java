@@ -1,10 +1,14 @@
 package ar.edu.itba.pod.data;
 
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
+import ar.edu.itba.pod.data.Exceptions.AirlineNotMatchesCounterRangeException;
+import ar.edu.itba.pod.data.Exceptions.NotRangeAssignedException;
 import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
+import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 import org.checkerframework.checker.units.qual.C;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 import java.util.concurrent.BlockingQueue;
@@ -23,7 +27,7 @@ public class Sector {
 
     public void addCounter(int counterId){
         counters.add(new Counter(counterId, this));
-        freeCounters.add(new Counter(counterId, this));
+//        freeCounters.add(new Counter(counterId, this)); // TODO: No se porque pusieron esto pero explota
     }
 
     public List<Counter> getCounters(){
@@ -59,7 +63,6 @@ public class Sector {
     public AssignCountersResponse assignCounters(int counterCount, Airline airline, List<String> flights){
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
-            //TODO ASSIGN PENDIENTES
             System.out.println("Adding wachito to queue");
             airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
             return AssignCountersResponse.newBuilder().setFirstPosition(-1).setPendingAhead(airlineBlockingQueue.size()).build();
@@ -110,13 +113,31 @@ public class Sector {
 
     private void addFlightsToCounters(int startPosition, int counterCount, List<String> flights, Airline airline){
         for(Counter counter : counters){
-            if(counter.getCounterId() >= startPosition && counter.getCounterId() < startPosition+counterCount){
+            if(counter.getCounterId() >= startPosition && counter.getCounterId() < startPosition + counterCount){
                 for(String flight : flights){
                     counter.addFlight(airline.getFlight(flight));
+                }
+                if (counter.getCounterId() == startPosition) {
+                    counter.assignStartOfRange(counterCount);
                 }
             }
         }
     }
 
 
+    public List<CheckInCountersDTO> checkInCounters(int counterFrom, Airline airline) {
+        // Aca quiero fijarme si en counterFrom hay un rango asignado y en ese caso quiero sacar cosas de la cola
+        for (Counter counter : counters) {
+            if (counter.getCounterId() == counterFrom) {
+                if (!counter.isStartOfRange()) {
+                    throw new NotRangeAssignedException();
+                }
+                if (counter.getAirline().equals(airline.getAirlineName())) {
+                    throw new AirlineNotMatchesCounterRangeException();
+                }
+                return counter.consumePassengerQueue();
+            }
+        }
+        return Collections.emptyList();
+    }
 }
