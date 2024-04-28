@@ -9,8 +9,10 @@ import ar.edu.itba.pod.counterReservation.ListPendingAssignmentsResponse;
 import ar.edu.itba.pod.counterReservation.PendingAssignmentsInformation;
 import ar.edu.itba.pod.data.Exceptions.*;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.events.EventsResponse;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 public class Airport {
     private static Airport airport = null;
@@ -302,5 +304,19 @@ public class Airport {
             builder.setCounter(passenger.getCheckedInAtCounter());
         }
         return builder.build();
+    }
+
+    public BlockingQueue<EventsResponse> RegisterAirlineForEvents(String airline){
+        if(!airlines.containsKey(airline)){
+            throw new AirlineNotFoundException();
+        }
+        return airlines.get(airline).registerForEvents();
+    }
+
+    public void UnregisterAirlineForEvents(String airline){
+        if(!airlines.containsKey(airline)){
+            throw new AirlineNotFoundException();
+        }
+        airlines.get(airline).unregisterForEvents();
     }
 }
