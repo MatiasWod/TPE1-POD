@@ -18,7 +18,6 @@ import java.util.concurrent.SynchronousQueue;
 public class Sector {
     private final String name;
     private final List<Counter> counters = new ArrayList<>();
-    private final PriorityQueue<Counter> freeCounters = new PriorityQueue<>();
     private final BlockingQueue<AirlineCounterRequest> airlineBlockingQueue = new LinkedBlockingQueue<>();
 
     public Sector(String name){
