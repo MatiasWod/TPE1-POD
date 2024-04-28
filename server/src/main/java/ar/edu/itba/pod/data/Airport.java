@@ -6,9 +6,10 @@ import ar.edu.itba.pod.checkIn.GetPassengerStatusResponse;
 import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
 import ar.edu.itba.pod.counterReservation.ListPendingAssignmentsResponse;
-import ar.edu.itba.pod.counterReservation.PendingAssignmentsInformation;
 import ar.edu.itba.pod.data.Exceptions.*;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.data.Utils.CheckInHistoryInfo;
+import ar.edu.itba.pod.data.Utils.CounterState;
 
 import java.util.*;
 
@@ -95,27 +96,60 @@ public class Airport {
 
 
     //Query Service
-    public List<CounterState> getCountersState(String sectorName){
+    public List<CounterState> getAllCountersState(){
         synchronized (sectorLock){
-            if (!sectors.containsKey(sectorName)){
-                throw new IllegalArgumentException();
-            }
-
-            if(sectors.get(sectorName).getCounters().isEmpty()){
-                //TODO implementar
-                return null;
-            }
             List<CounterState> counterStates = new ArrayList<>();
-            List<Counter> counters = sectors.get(sectorName).getCounters();
-            for (Counter counter: counters){
-                //TODO ordenar clases
-//                counterStates.add(new CounterState(sectorName,counters.getFirst().getCounterId(),counters.getLast().getCounterId(),counter.,counter.getFlightCode(),counter.getPeople()));
+            for(Sector sector : sectors.values()){
+                counterStates.addAll(getCountersState(sector.getName()));
             }
             return counterStates;
         }
     }
 
-    public List<CheckInHistoryInfo> getCheckInHistory(String sectorName,String airlineName ){
+    public List<CounterState> getCountersState(String sectorName) {
+        synchronized (sectorLock) {
+            if (!sectors.containsKey(sectorName)) {
+                throw new IllegalArgumentException();
+            }
+
+            if (sectors.get(sectorName).getCounters().isEmpty()) {
+                //TODO implementar
+                return null;
+            }
+            List<CounterState> counterStates = new ArrayList<>();
+            Sector sector = sectors.get(sectorName);
+            int startCounterId = -1;
+            int lastCounterId= -1;
+            for (Counter counter : sector.getCounters()) {
+                if (counter.isStartOfRange()) {
+                    if (startCounterId != -1) {
+                        counterStates.add(new CounterState(sectorName, startCounterId, lastCounterId, counter.getAirline(), counter.getFlights(), counter.getQueueSize()));
+                        startCounterId = -1;
+                    }
+                    counterStates.add(new CounterState(sectorName, counter.getCounterId(), counter.getCounterId() + counter.getRangeLength() - 1, counter.getAirline(), counter.getFlights(), counter.getQueueSize()));
+                }else if (!counter.isFree()){
+                    continue;
+                } else if (lastCounterId!=-1 && (counter.getCounterId() != (lastCounterId + 1))){
+                    counterStates.add(new CounterState(sectorName, startCounterId, lastCounterId, counter.getAirline(), counter.getFlights(), counter.getQueueSize()));
+                    startCounterId = counter.getCounterId();
+                    lastCounterId = counter.getCounterId();
+                } else {
+                    if (startCounterId == -1) {
+                        startCounterId = counter.getCounterId();
+                    }
+                    lastCounterId = counter.getCounterId();
+                }
+
+            }
+            if (startCounterId != -1) {
+                int lastIndex=sector.getCounters().size()-1;
+                counterStates.add(new CounterState(sectorName, startCounterId, lastCounterId, sector.getCounters().get(lastIndex).getAirline(), sector.getCounters().get(lastIndex).getFlights(), sector.getCounters().get(lastIndex).getQueueSize()));
+            }
+            return counterStates;
+        }
+    }
+
+    public List<CheckInHistoryInfo> getCheckInHistory(String sectorName, String airlineName ){
         synchronized (sectorLock){
             if (!sectors.containsKey(sectorName)){
                 throw new IllegalArgumentException();

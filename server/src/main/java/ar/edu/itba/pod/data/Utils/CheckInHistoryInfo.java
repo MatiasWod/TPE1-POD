@@ -1,4 +1,4 @@
-package ar.edu.itba.pod.data;
+package ar.edu.itba.pod.data.Utils;
 
 public class CheckInHistoryInfo {
     private final String sectorName;

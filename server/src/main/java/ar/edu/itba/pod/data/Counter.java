@@ -108,6 +108,9 @@ public class Counter {
     }
 
     public Integer getQueueSize() {
+        if (passengerQueue == null) {
+            return 0;
+        }
         return passengerQueue.size();
     }
 
