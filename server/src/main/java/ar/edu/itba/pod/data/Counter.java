@@ -52,7 +52,6 @@ public class Counter {
         if (!passengerQueue.isEmpty()) {
             throw new PassengerQueueNotEmptyException();
         }
-
         if (startOfRange) {
             // Aca se puede chequear si quedaban pasajeros en la fila
             for (Flight flight : flights) {

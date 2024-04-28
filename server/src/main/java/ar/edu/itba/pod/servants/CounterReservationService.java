@@ -9,6 +9,7 @@ import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,12 +40,15 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
                                     .setFirstCounter(counterRange.getFirstCounter().getCounterId())
                                     .setLastCounter(counterRange.getLastCounterId())
                                     .setAirline(counterRange.getAirline());
-                            int index = 0;
+                            List<String> flightsList = new ArrayList<>();
+
                             counterRange.getFirstCounter().getFlights().forEach(flight -> {
                                 if (flight != null) {
-                                    countersInformationBuilder.setFlights(index, flight.getFlightCode());
+                                    flightsList.add(flight.getFlightCode());
                                 }
                             });
+
+                            countersInformationBuilder.addAllFlights(flightsList);
                             countersInformationBuilder.setPeople(780556); //TODO PONER ESTO
                             return countersInformationBuilder.build();
                         }).collect(Collectors.toList())
