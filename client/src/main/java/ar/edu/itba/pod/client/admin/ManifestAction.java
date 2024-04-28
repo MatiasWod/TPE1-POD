@@ -33,7 +33,8 @@ public class ManifestAction extends Action {
                 Stream<String> lines = Files.lines(Paths.get(System.getProperty("inPath"))).skip(1);
                 ){
             lines.forEach(line ->{
-                    try{
+                    try
+                    {
                         String[] fields = line.split(";");
                         if(fields.length != NUMBER_OF_FIELDS){
                             failedCalls.getAndIncrement();
@@ -48,12 +49,20 @@ public class ManifestAction extends Action {
                                     fields[2]
                             ));
                         }
-            }
-            catch (NumberFormatException exception){
+                    }
+                    catch (NumberFormatException exception){
                         failedCalls.getAndIncrement();
-            }});
+                    }
+            });
             executorService.shutdown();
             executorService.awaitTermination(Util.SYSTEM_TIMEOUT,Util.SYSTEM_TIMEOUT_UNIT);
+        }
+        catch (StatusRuntimeException exception) {
+            if (exception.getStatus().getCode() == Status.FAILED_PRECONDITION.getCode()
+                    || exception.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
         }
         catch (IOException | InterruptedException exception){
             System.err.println(Util.GENERIC_ERROR_MESSAGE);
@@ -115,8 +124,9 @@ public class ManifestAction extends Action {
                 stub.loadPassengerSet(passengerRequest);
             }
             catch (StatusRuntimeException exception){
-                if (exception.getStatus() == Status.INVALID_ARGUMENT) {
-                    System.out.printf("Booking %s for %s %s addition failed\n",bookingCode,airlineName,flightCode);
+                if (exception.getStatus().getCode() == Status.FAILED_PRECONDITION.getCode()
+                        || exception.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
+                    System.err.printf("Booking %s for %s %s addition failed -> %s\n",bookingCode,airlineName,flightCode, exception.getMessage());
                     failedCalls.getAndIncrement();
                     return;
                 }

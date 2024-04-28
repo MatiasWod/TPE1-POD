@@ -36,7 +36,12 @@ public class CountersAction extends Action {
                     response.getFirstCounter(), response.getFirstCounter()+Integer.parseInt(System.getProperty("counters"))-1,System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
-            if (exception.getStatus() == Status.INVALID_ARGUMENT){
+            if (exception.getStatus().getCode() == Status.FAILED_PRECONDITION.getCode()
+            || exception.getStatus().getCode() == Status.NOT_FOUND.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
+            if (exception.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();
             } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
                 throw new ServerUnavailableException();

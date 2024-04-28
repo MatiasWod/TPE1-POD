@@ -1,10 +1,8 @@
 package ar.edu.itba.pod.server;
 
-import ar.edu.itba.pod.servants.AdminServant;
-import ar.edu.itba.pod.servants.CheckInService;
-import ar.edu.itba.pod.servants.CounterReservationService;
-import ar.edu.itba.pod.servants.QueryServant;
+import ar.edu.itba.pod.servants.*;
 import io.grpc.ServerBuilder;
+import io.grpc.ServerInterceptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +13,22 @@ public class Server {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         logger.info(" Server Starting ...");
+        GlobalExceptionHandlerInterceptor exceptionHandlerInterceptor = new GlobalExceptionHandlerInterceptor();
 
         int port = 50051;
         io.grpc.Server server = ServerBuilder.forPort(port)
-                .addService(new AdminServant())
-                .addService(new CheckInService())
-                .addService(new CounterReservationService())
-                .addService(new QueryServant())
+                .addService(ServerInterceptors.intercept(
+                                new AdminServant(),
+                                exceptionHandlerInterceptor))
+                .addService(ServerInterceptors.intercept(
+                        new CheckInService(),
+                        exceptionHandlerInterceptor))
+                .addService(ServerInterceptors.intercept(
+                        new CounterReservationService(),
+                        exceptionHandlerInterceptor))
+                .addService(ServerInterceptors.intercept(
+                        new QueryServant(),
+                        exceptionHandlerInterceptor))
                 .build();
         server.start();
         logger.info("Server started, listening on " + port);
