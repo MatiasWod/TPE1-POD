@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "commons.proto";
+
+package events;
+
+option java_package = "ar.edu.itba.pod.events";
+option java_multiple_files = true;
+
+service EventsService{
+  rpc register(RegistrationRequest) returns (EventsResponse);
+  rpc unregister(RegistrationRequest) returns(commons.Empty);
+}
+
+message RegistrationRequest{
+  string airlineName = 1;
+}
+
+message EventsResponse{
+  EventStatus status = 1;
+  int32 counterCount = 2;
+  int32 firstCounter = 3;
+  int32 lastCounter = 4;
+  string sector = 5;
+  repeated string flights = 6;
+  int32 people = 7;
+  int32 pendingAhead = 8;
+}
+
+enum EventStatus{
+  REGISTER_SUCCESS = 0;
+  COUNTER_ASSIGNMENT_SUCCESS = 1;
+  PASSENGER_QUEUE_SUCCESS = 2;
+  CHECKIN_SUCCESS = 3;
+  COUNTER_FREED = 4;
+  COUNTER_ASSIGNMENT_PENDING = 5;
+  COUNTER_ASSIGNMENT_PENDING_CHANGE = 6;
+  DESTROYED = 7;
+}

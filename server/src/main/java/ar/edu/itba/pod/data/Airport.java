@@ -6,11 +6,12 @@ import ar.edu.itba.pod.checkIn.GetPassengerStatusResponse;
 import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
 import ar.edu.itba.pod.counterReservation.ListPendingAssignmentsResponse;
-import ar.edu.itba.pod.counterReservation.PendingAssignmentsInformation;
 import ar.edu.itba.pod.data.Exceptions.*;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.events.EventsResponse;
 
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
 
 public class Airport {
     private static Airport airport = null;
@@ -37,7 +38,7 @@ public class Airport {
     public void addSector(String sectorName){
         synchronized (sectorLock){
             if(sectors.containsKey(sectorName)){
-                throw new IllegalArgumentException();
+                throw new SectorAlreadyExistsException(sectorName);
             }
             sectors.put(sectorName,new Sector(sectorName));
         }
@@ -51,8 +52,11 @@ public class Airport {
 
     public int addCounters(String sectorName, int counterCount){
         synchronized (sectorLock){
-            if (!sectors.containsKey(sectorName) || counterCount <= COUNTERS_INCORRECT_COUNT){
-                throw new IllegalArgumentException();
+            if (!sectors.containsKey(sectorName)){
+                throw new SectorNotFoundException(sectorName);
+            }
+            if (counterCount <= COUNTERS_INCORRECT_COUNT) {
+                throw new CounterCountShouldBePositiveException();
             }
             //TE CAMBIE EL CODIGO CANE NO SE SI TIENE SENTIDO
             int firstCounter = globalCounterNumber;
@@ -78,12 +82,12 @@ public class Airport {
             //TODO revisar
             for (Airline m : airlines.values()) {
                 if (m.getFlights().containsKey(flightCode) && (!m.getFlights().get(flightCode).getAirlineName().equals(airlineName))) {
-                    throw new IllegalArgumentException();
+                    throw new FlightCodeAlreadyExistsInOtherAirlineException(flightCode, m.getFlights().get(flightCode).getAirlineName());
                 }
             }
 
             if(passengers.get(bookingCode) != null) {
-                throw new PassengerAlreadyExistsException();
+                throw new PassengerAlreadyExistsException(bookingCode);
             }
             Passenger passenger = new Passenger(bookingCode, flightCode, airlineName, PassengerStatus.NEW_BORN);
             passengers.put(bookingCode, passenger);
@@ -237,7 +241,7 @@ public class Airport {
             throw new PassengerAlreadyCheckedIn();
         }
         if (!sectors.containsKey(sectorName)) {
-            throw new SectorNotFoundException();
+            throw new SectorNotFoundException(sectorName);
         }
 
         Sector sector = sectors.get(sectorName);
@@ -302,5 +306,19 @@ public class Airport {
             builder.setCounter(passenger.getCheckedInAtCounter());
         }
         return builder.build();
+    }
+
+    public BlockingQueue<EventsResponse> RegisterAirlineForEvents(String airline){
+        if(!airlines.containsKey(airline)){
+            throw new AirlineNotFoundException();
+        }
+        return airlines.get(airline).registerForEvents();
+    }
+
+    public void UnregisterAirlineForEvents(String airline){
+        if(!airlines.containsKey(airline)){
+            throw new AirlineNotFoundException();
+        }
+        airlines.get(airline).unregisterForEvents();
     }
 }

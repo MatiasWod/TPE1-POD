@@ -31,6 +31,10 @@ public class SectorAction extends Action {
             System.out.printf("Sector %s added successfully\n", System.getProperty("sector"));
         }
         catch (StatusRuntimeException exception){
+            if (exception.getStatus().getCode() == Status.ALREADY_EXISTS.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
             if (exception.getStatus() == Status.INVALID_ARGUMENT){
                 throw new IllegalArgumentException();
             } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
