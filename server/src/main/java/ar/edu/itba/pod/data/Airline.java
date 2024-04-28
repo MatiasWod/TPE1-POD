@@ -15,11 +15,11 @@ public class Airline {
         this.airlineName = airlineName;
     }
 
-    public void loadFlight(String airlineName, String flightCode, String bookingCode){
-        if(!flights.containsKey(flightCode)){
-            flights.put(flightCode, new Flight(new ArrayList<>(), flightCode, airlineName));
+    public void loadFlight(Passenger passenger){
+        if(!flights.containsKey(passenger.getFlightCode())){
+            flights.put(passenger.getFlightCode(), new Flight(new ArrayList<>(), passenger.getFlightCode(), passenger.getAirlineCode()));
         }
-        flights.get(flightCode).addPassenger(new Passenger(bookingCode, flightCode, airlineName));
+        flights.get(passenger.getFlightCode()).addPassenger(passenger);
     }
 
     public Map<String, Flight> getFlights(){

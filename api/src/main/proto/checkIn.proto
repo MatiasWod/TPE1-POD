@@ -40,7 +40,8 @@ message GetInlineResponse {
   int32 queueSize = 2;
   string booking = 3;
   string sector = 4;
-  string counters = 5;
+  int32 counterFrom = 5;
+  int32 counterTo = 8;
   string flightCode = 6;
   string airline = 7;
 }

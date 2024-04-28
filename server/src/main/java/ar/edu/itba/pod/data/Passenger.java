@@ -1,16 +1,20 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.checkIn.PassengerStatus;
+
 import java.util.Objects;
 
 public class Passenger {
     private String bookingCode;
     private String flightCode;
     private String airlineCode;
+    private PassengerStatus status;
 
-    public Passenger(String bookingCode, String flightCode, String airlineCode) {
+    public Passenger(String bookingCode, String flightCode, String airlineCode, PassengerStatus status) {
         this.bookingCode = bookingCode;
         this.flightCode = flightCode;
         this.airlineCode = airlineCode;
+        this.status = status;
     }
 
     @Override
@@ -36,5 +40,13 @@ public class Passenger {
 
     public String getAirlineCode() {
         return airlineCode;
+    }
+
+    public PassengerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PassengerStatus status) {
+        this.status = status;
     }
 }

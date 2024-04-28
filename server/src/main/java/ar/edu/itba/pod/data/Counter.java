@@ -1,5 +1,6 @@
 package ar.edu.itba.pod.data;
 
+import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.data.Exceptions.PassengerQueueNotEmptyException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 
@@ -76,6 +77,10 @@ public class Counter {
         for (int cId = getCounterId(); cId < getCounterId() + rangeLength; cId++) {
             Passenger passenger = passengerQueue.poll();
             toRet.add(new CheckInCountersDTO(passenger, cId));
+
+            if (passenger != null) {
+                passenger.setStatus(PassengerStatus.checkedIn);
+            }
         }
         return toRet;
     }
@@ -90,6 +95,15 @@ public class Counter {
 
     public boolean containsFlightCode(String flightCode) {
         return flights.stream().anyMatch(f -> Objects.equals(f.getFlightCode(), flightCode));
+    }
+
+    public boolean checkIfPassengerInQueue(Passenger passenger) {
+        return passengerQueue.contains(passenger);
+    }
+
+    public int addPassengerToQueue(Passenger passenger) {
+        passengerQueue.add(passenger);
+        return passengerQueue.size() - 1;
     }
 
     /*

@@ -70,6 +70,7 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
         List<CheckInCountersDTO> checkInCountersDTOS = airport.checkInCounters(request.getSectorName(), request.getFromVal(), request.getAirlineName());
 
 
+
         responseObserver.onNext(CheckInCountersOk.newBuilder()
                 .setIsOk(true).setCounterId(1).setBooking("LALALA").setFlight("EL_VUELO").build());
         responseObserver.onCompleted();

@@ -131,7 +131,7 @@ public class Sector {
                 if (!counter.isStartOfRange()) {
                     throw new NotRangeAssignedException();
                 }
-                if (counter.getAirline().equals(airline.getAirlineName())) {
+                if (!counter.getAirline().equals(airline.getAirlineName())) {
                     throw new AirlineNotMatchesCounterRangeException();
                 }
                 return counter.consumePassengerQueue();

@@ -29,9 +29,10 @@ public class GetInLineAction extends Action {
             );
 
             System.out.printf("Booking %s for flight %s from %s is now waiting to check-in" +
-                            "on counters %s in Sector %s with %d people in line%n",
+                            "on counters (%d-%d) in Sector %s with %d people in line%n",
                     response.getBooking(), response.getFlightCode(),
-                    response.getAirline(),response.getCounters(), response.getSector(), response.getQueueSize());
+                    response.getAirline(),response.getCounterFrom(), response.getCounterTo(),
+                    response.getSector(), response.getQueueSize());
         } catch (StatusRuntimeException e) {
             if (e.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();

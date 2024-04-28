@@ -2,7 +2,6 @@ package ar.edu.itba.pod.servants;
 
 import ar.edu.itba.pod.checkIn.*;
 import ar.edu.itba.pod.data.Airport;
-import ar.edu.itba.pod.data.Utils.PassengerCheckInInfoDTO;
 import io.grpc.stub.StreamObserver;
 
 public class CheckInService extends CheckInServiceGrpc.CheckInServiceImplBase {
@@ -19,16 +18,7 @@ public class CheckInService extends CheckInServiceGrpc.CheckInServiceImplBase {
     @Override
     public void getInLine(GetInlineRequest request, StreamObserver<GetInlineResponse> responseObserver) {
         // TODO: Call fucking service dude
-        System.out.println(request.getBooking());
-
-        GetInlineResponse response = GetInlineResponse.newBuilder()
-                .setFlightCode("AA123")
-                .setAirline("American Airlines")
-                .setCounters("[3-4]")
-                .setSector("C")
-                .setQueueSize(7)
-                .build();
-
+        GetInlineResponse response = airport.getPassengerInLine(request.getBooking(), request.getSectorName(), request.getCounterNumber());
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

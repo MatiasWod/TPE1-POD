@@ -62,7 +62,13 @@ message CheckInCountersOk {
   bool isOk = 1;
   string booking = 2; // TODO: Booking + CounterId should be repeated
   int32 counterId = 3;
+//  repeated BookingCounterId // TODO: Usar este
   string flight = 4;
+}
+
+message BookingCounterId {
+  string booking = 1;
+  int32 counterId = 2;
 }
 
 message AssignCountersResponse{
