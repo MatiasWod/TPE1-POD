@@ -3,7 +3,10 @@ package ar.edu.itba.pod.client.counterReservation;
 import ar.edu.itba.pod.client.Action;
 import ar.edu.itba.pod.client.ServerUnavailableException;
 import ar.edu.itba.pod.client.Util;
-import ar.edu.itba.pod.counterReservation.*;
+import ar.edu.itba.pod.counterReservation.BookingCounterId;
+import ar.edu.itba.pod.counterReservation.CheckInCountersRequest;
+import ar.edu.itba.pod.counterReservation.CheckInCountersReservationResponse;
+import ar.edu.itba.pod.counterReservation.counterReservationServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
@@ -25,11 +28,17 @@ public class CountersCheckinAction extends Action {
                     .setAirlineName(System.getProperty("airline"))
                     .setFromVal(Integer.parseInt(System.getProperty("counterFrom")));
 
-            CheckInCountersOk response =  stub.checkInCounters(checkInCountersRequestBuilder.build());
+            CheckInCountersReservationResponse response = stub.checkInCounters(checkInCountersRequestBuilder.build());
 
-            System.out.printf("Check-in successful of %s for flight %s at counter %d",
-                    response.getBooking(), response.getFlight(),
-                    response.getCounterId());
+            for (BookingCounterId Counter : response.getBookingCounterIdList()) {
+                if (Counter.getIsEmpty()) {
+                    System.out.println("Counter " + Counter.getCounterId() + " is idle");
+                } else {
+                    System.out.println("Check-in successful of " + Counter.getBooking() + " for flight " + Counter.getFlight() + " at counter " + Counter.getCounterId());
+                }
+            }
+
+
 
         } catch (StatusRuntimeException exception) {
             if (exception.getStatus() == Status.INVALID_ARGUMENT) {

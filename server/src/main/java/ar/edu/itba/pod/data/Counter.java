@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class Counter {
     private final int counterId;
@@ -15,7 +17,7 @@ public class Counter {
     private final List<Flight> flights= new ArrayList<>();
     private boolean startOfRange = false;
     private int rangeLength = 0;
-    private PriorityQueue<Passenger> passengerQueue;
+    private BlockingQueue<Passenger> passengerQueue;
     
     public Counter(int counterId, Sector sector){
         this.counterId = counterId;
@@ -69,19 +71,25 @@ public class Counter {
     public void assignStartOfRange(int counterCount) {
         startOfRange = true;
         rangeLength = counterCount;
-        passengerQueue = new PriorityQueue<>();
+        passengerQueue = new LinkedBlockingQueue<>() {
+        };
     }
 
     public List<CheckInCountersDTO> consumePassengerQueue() {
         List<CheckInCountersDTO> toRet = new ArrayList<>();
         for (int cId = getCounterId(); cId < getCounterId() + rangeLength; cId++) {
             Passenger passenger = passengerQueue.poll();
-            toRet.add(new CheckInCountersDTO(passenger, cId));
+            CheckInCountersDTO passengerData = new CheckInCountersDTO(cId);
 
             if (passenger != null) {
+                passengerData.setPassenger(passenger);
                 passenger.setStatus(PassengerStatus.checkedIn);
+            }else {
+                passengerData.setEmpty(true);
             }
-        }
+
+            toRet.add(passengerData);
+            }
         return toRet;
     }
 
