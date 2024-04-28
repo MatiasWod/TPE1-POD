@@ -1,12 +1,9 @@
 package ar.edu.itba.pod.servants;
 
-import ar.edu.itba.pod.checkIn.Booking;
-import ar.edu.itba.pod.checkIn.CheckInCountersResponse;
 import ar.edu.itba.pod.commons.Empty;
 import ar.edu.itba.pod.counterReservation.*;
 import ar.edu.itba.pod.data.Airport;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
-import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
@@ -72,13 +69,23 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
     }
 
     @Override
-    public void checkInCounters(CheckInCountersRequest request, StreamObserver<CheckInCountersOk> responseObserver){
+    public void checkInCounters(CheckInCountersRequest request, StreamObserver<CheckInCountersReservationResponse> responseObserver) {
         List<CheckInCountersDTO> checkInCountersDTOS = airport.checkInCounters(request.getSectorName(), request.getFromVal(), request.getAirlineName());
 
+        CheckInCountersReservationResponse response = CheckInCountersReservationResponse.newBuilder().addAllBookingCounterId(
+                checkInCountersDTOS.stream().map(checkInCountersDTO -> {
+                    BookingCounterId.Builder bookingCounterIdBuilder = BookingCounterId.newBuilder()
+                            .setIsEmpty(checkInCountersDTO.isEmpty())
+                            .setCounterId(checkInCountersDTO.getCounterId());
+                    if (!checkInCountersDTO.isEmpty()) {
+                        bookingCounterIdBuilder.setBooking(checkInCountersDTO.getPassenger().getBookingCode());
+                        bookingCounterIdBuilder.setFlight(checkInCountersDTO.getPassenger().getFlightCode());
+                    }
+                    return bookingCounterIdBuilder.build();
+                }).collect(Collectors.toList())
+        ).build();
 
-
-        responseObserver.onNext(CheckInCountersOk.newBuilder()
-                .setIsOk(true).setCounterId(1).setBooking("LALALA").setFlight("EL_VUELO").build());
+                    responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
 

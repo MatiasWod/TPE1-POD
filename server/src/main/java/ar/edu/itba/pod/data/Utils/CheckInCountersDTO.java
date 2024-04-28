@@ -4,11 +4,15 @@ import ar.edu.itba.pod.data.Passenger;
 
 public class CheckInCountersDTO {
     private Passenger passenger;
-    private int counterId;
+    private final int counterId;
+    private boolean isEmpty = false;
 
-    public CheckInCountersDTO(Passenger passenger, int counterId) {
-        this.passenger = passenger;
+    public CheckInCountersDTO(int counterId) {
         this.counterId = counterId;
+    }
+
+    public void setPassenger(Passenger passenger) {
+        this.passenger = passenger;
     }
 
     public Passenger getPassenger() {
@@ -18,4 +22,13 @@ public class CheckInCountersDTO {
     public int getCounterId() {
         return counterId;
     }
+
+    public boolean isEmpty() {
+        return isEmpty;
+    }
+
+    public void setEmpty(boolean isEmpty) {
+        this.isEmpty = isEmpty;
+    }
+
 }

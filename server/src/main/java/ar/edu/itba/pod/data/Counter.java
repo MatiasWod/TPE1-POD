@@ -63,6 +63,7 @@ public class Counter {
             passengerQueue = null;
             rangeLength = 0;
         }
+
         flights.clear();
     }
 
@@ -83,20 +84,26 @@ public class Counter {
     public void assignStartOfRange(int counterCount) {
         startOfRange = true;
         rangeLength = counterCount;
-        passengerQueue = new LinkedBlockingQueue<>();
+        passengerQueue = new LinkedBlockingQueue<>() {
+        };
     }
 
     public List<CheckInCountersDTO> consumePassengerQueue() {
         List<CheckInCountersDTO> toRet = new ArrayList<>();
         for (int cId = getCounterId(); cId < getCounterId() + rangeLength; cId++) {
             Passenger passenger = passengerQueue.poll();
-            toRet.add(new CheckInCountersDTO(passenger, cId));
+            CheckInCountersDTO passengerData = new CheckInCountersDTO(cId);
 
             if (passenger != null) {
                 passenger.setStatus(PassengerStatus.CHECKED_IN);
                 passenger.setCheckedInAtCounter(cId);
+                passengerData.setPassenger(passenger);
+            }else {
+                passengerData.setEmpty(true);
             }
-        }
+
+            toRet.add(passengerData);
+            }
         return toRet;
     }
 

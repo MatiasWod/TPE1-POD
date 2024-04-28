@@ -29,6 +29,9 @@ public class Server {
                 .addService(ServerInterceptors.intercept(
                         new QueryServant(),
                         exceptionHandlerInterceptor))
+                .addService(ServerInterceptors.intercept(
+                        new EventsService(),
+                        exceptionHandlerInterceptor))
                 .build();
         server.start();
         logger.info("Server started, listening on " + port);
