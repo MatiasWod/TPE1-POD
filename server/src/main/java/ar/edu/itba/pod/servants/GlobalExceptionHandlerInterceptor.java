@@ -52,13 +52,11 @@ public class GlobalExceptionHandlerInterceptor implements ServerInterceptor {
             Map.entry(CounterRangeAlreadyAssignedToflight.class, Code.ALREADY_EXISTS),
             Map.entry(FlightCodeAlreadyInCounterRangeQueue.class, Code.ALREADY_EXISTS),
             Map.entry(StillPassengersInLineException.class, Code.FAILED_PRECONDITION),
-            Map.entry(AirlineAlreadyRegisteredForEventsException.class, Code.ALREADY_EXISTS)
-
+            Map.entry(AirlineAlreadyRegisteredForEventsException.class, Code.ALREADY_EXISTS),
             Map.entry(BookingNotFoundException.class, Code.NOT_FOUND),
             Map.entry(NotRangeAssignedException.class, Code.ALREADY_EXISTS),
             Map.entry(FlightNotMatchesCounterException.class, Code.FAILED_PRECONDITION),
             Map.entry(PassengerAlreadyCheckedIn.class, Code.ALREADY_EXISTS),
-
             Map.entry(PassengerAlreadyInQueue.class, Code.FAILED_PRECONDITION)
         );
 
