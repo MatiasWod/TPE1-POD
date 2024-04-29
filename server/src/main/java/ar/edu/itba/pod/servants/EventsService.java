@@ -4,6 +4,7 @@ import ar.edu.itba.pod.commons.Empty;
 
 import ar.edu.itba.pod.data.Airline;
 import ar.edu.itba.pod.data.Airport;
+import ar.edu.itba.pod.data.Exceptions.AirlineNotFoundException;
 import ar.edu.itba.pod.events.EventStatus;
 import ar.edu.itba.pod.events.EventsResponse;
 import ar.edu.itba.pod.events.EventsServiceGrpc;
@@ -20,11 +21,13 @@ public class EventsService extends EventsServiceGrpc.EventsServiceImplBase {
     public void register(RegistrationRequest request, StreamObserver<EventsResponse> responseObserver) {
         try{
             BlockingQueue<EventsResponse> eventsQueue = airport.RegisterAirlineForEvents(request.getAirlineName());
+            airport.notifyAirline(request.getAirlineName(), EventsResponse.newBuilder().setStatus(EventStatus.REGISTER_SUCCESS).build());
             while(eventsQueue!=null){
                 EventsResponse eventsResponse = eventsQueue.take();
                 if(eventsResponse.getStatus()!= EventStatus.DESTROYED){
                     responseObserver.onNext(eventsResponse);
                 }else{
+                    responseObserver.onNext(eventsResponse);
                     responseObserver.onCompleted();
                     return;
                 }
@@ -44,12 +47,8 @@ public class EventsService extends EventsServiceGrpc.EventsServiceImplBase {
             responseObserver.onNext(Empty.newBuilder().build());
             responseObserver.onCompleted();
         }
-        catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException();
+        catch (IllegalArgumentException | AirlineNotFoundException e) {
+            throw new IllegalArgumentException(e);
         }
-
     }
-
-
-
 }

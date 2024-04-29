@@ -25,6 +25,7 @@ public class UnregisterAction extends Action {
         try{
             RegistrationRequest unregisterRequest = RegistrationRequest.newBuilder().setAirlineName(System.getProperty("airline")).build();
             stub.unregister(unregisterRequest);
+            System.out.println(System.getProperty("airline") + " unregistered successfully for events\n");
         }
         catch (StatusRuntimeException exception){
             if (exception.getStatus() == Status.INVALID_ARGUMENT){

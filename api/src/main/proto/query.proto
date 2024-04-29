@@ -13,7 +13,18 @@ service QueryService {
 }
 
 message CountersStateRequest{
+    oneof request {
+        CountersStateRequestWithSector sector = 1;
+        CountersStateRequestWithOutSector noSector = 2;
+    }
+}
+
+message CountersStateRequestWithSector{
     string sectorName = 1;
+}
+
+message CountersStateRequestWithOutSector{
+
 }
 
 message CountersStateResponse {
@@ -25,8 +36,12 @@ message CounterState{
     int32 counterStart = 2;
     int32 counterEnd = 3;
     string airlineName = 4;
-    string flightCode = 5;
+    repeated Flights flights = 5;
     int32 people = 6;
+}
+
+message Flights{
+    string flightCode = 1;
 }
 
 message CheckInHistoryRequest {
@@ -45,4 +60,6 @@ message CheckInHistory {
     string flightCode = 4;
     string bookingCode = 5;
 }
+
+
 

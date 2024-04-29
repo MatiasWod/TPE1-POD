@@ -1,6 +1,8 @@
 package ar.edu.itba.pod.data;
 
 
+import ar.edu.itba.pod.data.Exceptions.AirlineAlreadyRegisteredForEventsException;
+import ar.edu.itba.pod.data.Exceptions.AirlineNotRegisteredException;
 import ar.edu.itba.pod.events.EventStatus;
 import ar.edu.itba.pod.events.EventsResponse;
 
@@ -50,14 +52,32 @@ public class Airline {
         return airlineName;
     }
 
+    public void notifyEvent(EventsResponse eventResponse){
+        synchronized (eventsLock){
+            if(eventsQueue != null){
+                eventsQueue.add(eventResponse);
+            }
+        }
+    }
+
     public BlockingQueue<EventsResponse> registerForEvents(){
-        eventsQueue = new LinkedBlockingQueue<>();
-        return eventsQueue;
+        synchronized (eventsLock){
+            if(eventsQueue != null){
+                throw new AirlineAlreadyRegisteredForEventsException();
+            }
+            eventsQueue = new LinkedBlockingQueue<>();
+            return eventsQueue;
+        }
     }
 
     public void unregisterForEvents(){
-        EventsResponse.Builder eventsResponse = EventsResponse.newBuilder().setStatus(EventStatus.DESTROYED);
-        eventsQueue.add(eventsResponse.build());
-        eventsQueue = null;
+        synchronized (eventsLock){
+            if(eventsQueue == null){
+                throw new AirlineNotRegisteredException();
+            }
+            EventsResponse.Builder eventsResponse = EventsResponse.newBuilder().setStatus(EventStatus.DESTROYED);
+            eventsQueue.add(eventsResponse.build());
+            eventsQueue = null;
+        }
     }
 }

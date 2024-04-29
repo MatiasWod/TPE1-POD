@@ -8,7 +8,7 @@ option java_package = "ar.edu.itba.pod.events";
 option java_multiple_files = true;
 
 service EventsService{
-  rpc register(RegistrationRequest) returns (EventsResponse);
+  rpc register(RegistrationRequest) returns (stream EventsResponse);
   rpc unregister(RegistrationRequest) returns(commons.Empty);
 }
 
@@ -25,6 +25,7 @@ message EventsResponse{
   repeated string flights = 6;
   int32 people = 7;
   int32 pendingAhead = 8;
+  string bookingCode = 9;
 }
 
 enum EventStatus{

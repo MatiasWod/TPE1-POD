@@ -13,7 +13,7 @@ public class QueryClient extends Client {
                                                     $> ./query-cli
                                                         -DserverAddress=xx.xx.xx.xx:yyyy
                                                         --Daction=actionName -DoutPath=query.txt [ -Dsector=sectorName | -Dairline=airlineName ]
-                                                                                                                         
+
                                                 """;
 
     @Override
