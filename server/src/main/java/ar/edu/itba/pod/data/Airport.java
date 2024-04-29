@@ -224,7 +224,6 @@ public class Airport {
             }
             return sectors.get(sectorName).assignCounters(counterCount, airlines.get(airlineString), flights);
         }
-
     }
 
     public List<CheckInCountersDTO> checkInCounters(String sectorName, int counterFrom, String airlineName){
@@ -269,7 +268,7 @@ public class Airport {
             Passenger passenger = passengers.get(booking);
 
             if (passenger == null) {
-                throw new BookingNotFoundException();
+                throw new BookingNotFoundException(booking);
             }
 
             Sector sector = sectors.get(passenger.getSector());
@@ -279,7 +278,7 @@ public class Airport {
                 throw new NotRangeAssignedException();
             }
             if (!counter.containsFlightCode(passenger.getFlightCode())) {
-                throw new FlightNotMatchesCounterException();
+                throw new FlightNotMatchesCounterException(passenger.getFlightCode(), counter.getCounterId(), sector.getName());
             }
 
             pDTO.setAirline(counter.getAirline());
@@ -299,10 +298,10 @@ public class Airport {
             GetInlineResponse.Builder builder = GetInlineResponse.newBuilder();
 
             if (passenger == null) {
-                throw new BookingNotFoundException();
+                throw new BookingNotFoundException(booking);
             }
             if (passenger.getStatus() == PassengerStatus.CHECKED_IN) {
-                throw new PassengerAlreadyCheckedIn();
+                throw new PassengerAlreadyCheckedIn(passenger.getBookingCode());
             }
             if (!sectors.containsKey(sectorName)) {
                 throw new SectorNotFoundException(sectorName);
@@ -312,13 +311,13 @@ public class Airport {
             for (Counter counter : sector.getCounters()) {
                 if (counter.getCounterId() == counterNumber) {
                     if (!counter.isStartOfRange()) {
-                        throw new BadCounterIdException();
+                        throw new BadCounterIdException(counterNumber, sectorName);
                     }
                     if (!Objects.equals(counter.getAirline(), passenger.getAirlineCode())) {
                         throw new AirlineNotMatchesCounterRangeException();
                     }
                     if (counter.checkIfPassengerInQueue(passenger)) {
-                        throw new PassengerAlreadyInQueue();
+                        throw new PassengerAlreadyInQueue(booking);
                     }
                     counter.addPassengerToQueue(passenger);
                     builder.setQueueSize(counter.getPeopleInFront(passenger))
@@ -349,7 +348,7 @@ public class Airport {
             GetPassengerStatusResponse.Builder builder = GetPassengerStatusResponse.newBuilder();
 
             if (passenger == null) {
-                throw new BookingNotFoundException();
+                throw new BookingNotFoundException(booking);
             }
 
             builder.setFlightCode(passenger.getFlightCode());

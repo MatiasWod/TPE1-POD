@@ -32,10 +32,16 @@ public class CountersAction extends Action {
                             " at counters (%d-%d) in Sector %s with %d people in line%n",
                     response.getFlightCode(), response.getAirline(),
                     response.getFromCounter(), response.getToCounter(), response.getSector(), response.getQueueSize());
-        } catch (StatusRuntimeException e) {
-            if (e.getStatus() == Status.INVALID_ARGUMENT) {
+        } catch (StatusRuntimeException exception) {
+            if (exception.getStatus().getCode() == Status.ALREADY_EXISTS.getCode() ||
+                    exception.getStatus().getCode() == Status.NOT_FOUND.getCode() ||
+                    exception.getStatus().getCode() == Status.FAILED_PRECONDITION.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
+            if (exception.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();
-            } else if (e.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
+            } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
                 throw new ServerUnavailableException();
             }
             System.err.println(Util.GENERIC_ERROR_MESSAGE);

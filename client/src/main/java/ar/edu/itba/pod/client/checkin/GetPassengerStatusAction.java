@@ -51,6 +51,12 @@ public class GetPassengerStatusAction extends Action {
                 }
             }
         } catch (StatusRuntimeException e) {
+            if (e.getStatus().getCode() == Status.ALREADY_EXISTS.getCode() ||
+                    e.getStatus().getCode() == Status.NOT_FOUND.getCode() ||
+                    e.getStatus().getCode() == Status.FAILED_PRECONDITION.getCode()) {
+                System.out.println(e.getMessage());
+                System.exit(1);
+            }
             if (e.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();
             } else if (e.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
