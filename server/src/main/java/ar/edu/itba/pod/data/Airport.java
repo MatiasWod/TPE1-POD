@@ -158,13 +158,21 @@ public class Airport {
     }
     public List<CheckInHistoryInfo> getCheckInHistory() {
         synchronized (sectorLock) {
-            return checkInHistoryList;
+            for(Sector s :sectors.values()){
+                if(!s.getCounters().isEmpty()){
+                    return checkInHistoryList;
+                }
+            }
+            throw new IllegalArgumentException();
         }
     }
 
     public List<CheckInHistoryInfo> getCheckInHistoryWithSector(String sectorName){
         synchronized (sectorLock){
             if (!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            if(sectors.get(sectorName).getCounters().isEmpty()){
                 throw new IllegalArgumentException();
             }
             List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();
@@ -179,6 +187,9 @@ public class Airport {
 
     public List<CheckInHistoryInfo> getCheckInHistoryWithAirline(String airlineName){
         synchronized (sectorLock){
+            if (!airlines.containsKey(airlineName)){
+                throw new IllegalArgumentException();
+            }
             List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();
             for (CheckInHistoryInfo checkInHistoryInfo: checkInHistoryList){
                 if (checkInHistoryInfo.getAirlineName().equals(airlineName)){
@@ -192,6 +203,9 @@ public class Airport {
 public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sectorName, String airlineName){
         synchronized (sectorLock){
             if (!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            if(sectors.get(sectorName).getCounters().isEmpty()){
                 throw new IllegalArgumentException();
             }
             List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();

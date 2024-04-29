@@ -68,7 +68,6 @@ public class Sector {
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
             //TODO faltan agregar los flights, por eso no se imprimen despues
-            System.out.println("Adding wachito to queue");
             airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
 
             //Notify the airline
