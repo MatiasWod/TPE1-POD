@@ -11,7 +11,6 @@ import io.grpc.StatusRuntimeException;
 
 import java.util.List;
 
-//TODO
 public class ListCountersAction extends Action {
 
     public ListCountersAction(List<String> argumentsForAction) {

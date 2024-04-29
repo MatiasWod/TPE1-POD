@@ -31,7 +31,6 @@ public class Sector {
 
     public void addCounter(int counterId){
         counters.add(new Counter(counterId, this));
-//        freeCounters.add(new Counter(counterId, this)); // TODO: No se porque pusieron esto pero explota
     }
 
     public List<Counter> getCounters(){
@@ -48,7 +47,6 @@ public class Sector {
         CounterRange current = null;
 
         for(Counter counter : counters){
-            //TODO CHANGE AIRLINE COMPARISION TO COUNTERRANGE COMPARISION (CHECK IF CONTIANS THE SAME FLIGHT ALSO)
             if(counter.getCounterId() >= min){
                 if(lastCounterAirline.equals(counter.getAirline())){
                     current.setCounterId(counter.getCounterId());
@@ -67,8 +65,7 @@ public class Sector {
     public AssignCountersResponse assignCounters(int counterCount, Airline airline, List<String> flights){
         int startPosition = getPositionForCountersAssignment(counterCount);
         if(startPosition == -1){
-            //TODO faltan agregar los flights, por eso no se imprimen despues
-            airlineBlockingQueue.add(new AirlineCounterRequest(airline,counterCount,flights));
+            airlineBlockingQueue.add(new AirlineCounterRequest(airline, counterCount, flights));
 
             //Notify the airline
             EventsResponse.Builder eventsResponseBuilder = EventsResponse.newBuilder().setStatus(EventStatus.COUNTER_ASSIGNMENT_PENDING)
@@ -109,7 +106,6 @@ public class Sector {
     }
 
     public void freeCounters(int counterFrom, Airline airline) {
-        //TODO revisar el método
         int freedAmount = 0;
         List<Flight> flights = new ArrayList<>();
 
@@ -195,7 +191,6 @@ public class Sector {
         return Collections.emptyList();
     }
 
-    //TODO REVISAR QUÉ TAN BIEN ESTÁ ESTO
     public ListPendingAssignmentsResponse getPendingAssignments(){
         List<AirlineCounterRequest> aux = airlineBlockingQueue.stream().sorted().toList();
         List<PendingAssignmentsInformation> pendingAssignmentsInformationList = new ArrayList<>();

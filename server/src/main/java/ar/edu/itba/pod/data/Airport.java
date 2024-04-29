@@ -82,9 +82,7 @@ public class Airport {
     }
 
     public void loadPassengerSet(String bookingCode, String flightCode, String airlineName){
-        //TODO dejarlo mas lindo
         synchronized (flightsLock){
-            //TODO revisar
             for (Airline m : airlines.values()) {
                 if (m.getFlights().containsKey(flightCode) && (!m.getFlights().get(flightCode).getAirlineName().equals(airlineName))) {
                     throw new FlightCodeAlreadyExistsInOtherAirlineException(flightCode, m.getFlights().get(flightCode).getAirlineName());

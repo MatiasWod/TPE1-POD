@@ -76,7 +76,7 @@ tar -xf <file.tar.gz>
 Then, give all executables permission to be executed:
 
 ```Bash
-chmod u+x ./client/*Client ./server/TPE1-POD
+chmod u+x ./tpe1-g10-client-2024.1Q/*Client.sh ./tpe1-g10-server-2024.1Q/server.sh
 ```
 
 ---
@@ -84,11 +84,16 @@ chmod u+x ./client/*Client ./server/TPE1-POD
 
 Must be running for the clients to work. Once it's stopped, all stored data is lost.
 
+```Bash
+cd tpe1-g10-server-2024.1Q
+sh server.sh
+```
+
 ---
 
 ### 3.2. Admin Client
 
-> 🚨 The current working directory **must** be `./client`.
+> 🚨 The current working directory **must** be `./tpe1-g10-client-2024.1Q`.
 
 Three operations are supported:
 
@@ -127,7 +132,7 @@ sh adminClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=manifest -DinPath=..
 ---
 ### 3.3. Counter Client
 
-> 🚨 The current working directory **must** be `./client`.
+> 🚨 The current working directory **must** be `./tpe1-g10-client-2024.1Q`.
 
 Six operations are supported:
 
@@ -176,7 +181,7 @@ sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=listPendingAssign
 ---
 ### 3.4. Passenger Client
 
-> 🚨 The current working directory **must** be `./client`.
+> 🚨 The current working directory **must** be `./tpe1-g10-client-2024.1Q`.
 
 Three operations are supported:
 
@@ -204,7 +209,7 @@ sh passengerClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerStatus
 ---
 ### 3.5. Events Client
 
-> 🚨 The current working directory **must** be `./client`.
+> 🚨 The current working directory **must** be `./tpe1-g10-client-2024.1Q`.
 
 Two operations are supported:
 
@@ -225,7 +230,7 @@ sh eventsClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=unregister -Dairli
 ---
 ### 3.6. Query Client
 
-> 🚨 The current working directory **must** be `./client`.
+> 🚨 The current working directory **must** be `./tpe1-g10-client-2024.1Q`.
 
 Two operations are supported:
 

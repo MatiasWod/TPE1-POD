@@ -31,7 +31,6 @@ public class CountersAction extends Action {
                     .build();
             AddCountersResponse response = stub.addCounters(countersRequest);
 
-            //TODO completar bien el print
             System.out.printf("%d new counters (%d-%d) in Sector %s added successfully\n",Integer.parseInt(System.getProperty("counters")),
                     response.getFirstCounter(), response.getFirstCounter()+Integer.parseInt(System.getProperty("counters"))-1,System.getProperty("sector"));
         }

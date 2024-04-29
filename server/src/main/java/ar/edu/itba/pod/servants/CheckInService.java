@@ -23,7 +23,6 @@ public class CheckInService extends CheckInServiceGrpc.CheckInServiceImplBase {
 
     @Override
     public void getPassengerStatus(Booking request, StreamObserver<GetPassengerStatusResponse> responseObserver) {
-        // TODO: Call fucking service dude
         GetPassengerStatusResponse response = airport.getPassengerStatus(request.getCode());
         responseObserver.onNext(response);
         responseObserver.onCompleted();

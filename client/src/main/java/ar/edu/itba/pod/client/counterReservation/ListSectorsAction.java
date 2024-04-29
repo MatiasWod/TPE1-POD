@@ -68,7 +68,6 @@ public class ListSectorsAction extends Action {
                 """;
     }
 
-    //TODO Mover al Server
     private void printCounters(List<Counter> countersList){
         int lastCounterId = countersList.get(0).getCounterId();
         System.out.printf("(%d-",lastCounterId);

@@ -161,19 +161,4 @@ public class Counter {
         airport.notifyAirline(passenger.getAirlineCode(), eventsResponseBuilder.build());
 
     }
-
-    /*
-    TODO: Maybe usar esto mas adelante
-    public void checkInCounters(int counterFrom, Airline airline) {
-        PriorityQueue<Counter> pq = new PriorityQueue<>(counters.subList(counterFrom, counters.size()));
-        while (!pq.isEmpty()) {
-            Counter counter = pq.poll();
-            if (counter.getAirline().equals(airline.getAirlineName())) {
-                counter.checkIn();
-            }
-            else {
-                return;
-            }
-        }
-    } */
 }
