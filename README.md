@@ -96,14 +96,14 @@ Three operations are supported:
 Adds a sector using the name given "sectorName" if it doesn't already exist.
 
 ```Bash
-./adminClient -DserverAddress=XX.XX.XX.XX:YYYY -Daction=addSector  -Dsector=sectorName 
+sh adminClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=addSector  -Dsector=sectorName 
 ```
 
 #### 3.2.2. Add Counters
 Adds counters to a sector, if the sector exists.
 
 ```Bash
-./adminClient -DserverAddress=XX.XX.XX.XX:YYYY -Daction=addCounters  -Dsector=sectorName  -Dcounters=countersAmount 
+sh adminClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=addCounters  -Dsector=sectorName  -Dcounters=countersAmount 
 ```
 
 #### 3.2.3. Load expected passenger
@@ -121,7 +121,7 @@ XYZ234;AA123;AmericanAirlines
 ```
 
 ```Bash
-./adminClient -DserverAddress=XX.XX.XX.XX:YYYY -Daction=manifest -DinPath=../manifest.csv
+sh adminClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=manifest -DinPath=../manifest.csv
 ```
 
 ---
@@ -135,42 +135,42 @@ Six operations are supported:
 Lists all current sectors and their counter ranges.
 
 ```Bash
-./counterClient -DserverAddress=XX.XX.XX.XX:YYYY -Daction=listSectors
+sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=listSectors
 ```
 
 #### 3.3.2. Print counters
 Lists given counter range giving the flights assigned to them or no information if they are free.
 
 ```Bash
-./counterClient -DserverAddress=XX.XX.XX.XX:YYYY -Daction=listCounters  -DcounterFrom=fromVal  -DcounterTo=toVal
+sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=listCounters  -DcounterFrom=fromVal  -DcounterTo=toVal
 ```
 
 #### 3.3.3. Assign counters
 Assigns counters to the given flights or leaves them pending if there are no available counters.
 
 ```Bash
-./counterClient -DserverAddress=XX.XX.XX.XX:YYYY -Daction=assignCounters  -Dsector=sectorName  -Dflights=flightCode1|flightCode2|...  -Dairline=airlineName  -DcounterCount=counterCount
+sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY -Daction=assignCounters  -Dsector=sectorName  -Dflights=flightCode1|flightCode2|...  -Dairline=airlineName  -DcounterCount=counterCount
 ```
 
 #### 3.3.4. Free counters
 Frees all assigned counters starting from `fromVal`.
 
 ```Bash
-./counterClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=freeCounters  -Dsector=sectorName  -DcounterFrom=fromVal  -Dairline=airlineName
+sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=freeCounters  -Dsector=sectorName  -DcounterFrom=fromVal  -Dairline=airlineName
 ```
 
 #### 3.3.5. Check-in for each counter
 Checks in a passenger for each counter starting from `fromVal`.
 
 ```Bash
-./counterClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkinCounters  -Dsector=sectorName  -DcounterFrom=fromVal  -Dairline=airlineName
+sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkinCounters  -Dsector=sectorName  -DcounterFrom=fromVal  -Dairline=airlineName
 ```
 
 #### 3.3.6. Print pending assignments
 Lists all flights from `sectorName` pending to be assigned to a counter.
 
 ```Bash
-./counterClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=listPendingAssignments  -Dsector=sectorName
+sh counterClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=listPendingAssignments  -Dsector=sectorName
 ```
 
 ---
@@ -184,21 +184,21 @@ Three operations are supported:
 Prints passenger check-in status given his `bookingCode`.
 
 ```Bash
-./passengerClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerStatus  -Dbooking=bookingCode
+sh passengerClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerStatus  -Dbooking=bookingCode
 ```
 
 #### 3.4.2. Enter counter range queue
 Enter counter range queue.
 
 ```Bash
-./passengerClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerCheckin  -Dbooking=flightCode  -Dsector=sectorName  -Dcounter=counterNumber
+sh passengerClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerCheckin  -Dbooking=flightCode  -Dsector=sectorName  -Dcounter=counterNumber
 ```
 
 #### 3.4.3. Print check-in status
 Print passenger's check-in status given his `bookingCode`.
 
 ```Bash
-./passengerClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerStatus  -Dbooking=bookingCode
+sh passengerClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=passengerStatus  -Dbooking=bookingCode
 ```
 
 ---
@@ -212,14 +212,14 @@ Two operations are supported:
 Register an airline to be notified of the events related to it.
 
 ```Bash
-./eventsClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=register  -Dairline=airlineName
+sh eventsClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=register  -Dairline=airlineName
 ```
 
 #### 3.5.2. Cancel airline registration to be notified
 Cancel an airline registration to be notified of the events related to it.
 
 ```Bash
-./eventsClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=unregister -Dairline=airlineName
+sh eventsClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=unregister -Dairline=airlineName
 ```
 
 ---
@@ -233,28 +233,28 @@ Two operations are supported:
 Print counters' current status filtering by sector given `sectorName` or simply prints all of them if not given.
 
 ```Bash
-./queryClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=queryCounters  -DoutPath=../query1.txt  -Dsector=sectorName
+sh queryClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=queryCounters  -DoutPath=../query1.txt  -Dsector=sectorName
 ```
 
 ```Bash
-./queryClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=queryCounters  -DoutPath=../query1.txt
+sh queryClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=queryCounters  -DoutPath=../query1.txt
 ```
 
 #### 3.6.2. Print completed check-in filtering by sector and airline
 Print completed check-in filtering by sector and airline, if given.
 
 ```Bash
-./queryClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt
+sh queryClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt
 ```
 
 ```Bash
-./queryClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt  -Dsector=sectorName
+sh queryClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt  -Dsector=sectorName
 ```
 
 ```Bash
-./queryClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt  -Dairline=airlineName
+sh queryClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt  -Dairline=airlineName
 ```
 
 ```Bash
-./queryClient -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt  -Dsector=sectorName  -Dairline=airlineName
+sh queryClient.sh -DserverAddress=XX.XX.XX.XX:YYYY  -Daction=checkins  -DoutPath=../query2.txt  -Dsector=sectorName  -Dairline=airlineName
 ```
