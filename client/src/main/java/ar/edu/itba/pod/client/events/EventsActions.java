@@ -2,7 +2,6 @@ package ar.edu.itba.pod.client.events;
 
 
 import ar.edu.itba.pod.client.Action;
-import ar.edu.itba.pod.client.query.QueryActions;
 
 import java.util.List;
 

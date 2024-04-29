@@ -3,13 +3,13 @@ package ar.edu.itba.pod.data;
 import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.data.Exceptions.StillPassengersInLineException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.data.Utils.CheckInHistoryInfo;
 import ar.edu.itba.pod.events.EventStatus;
 import ar.edu.itba.pod.events.EventsResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.PriorityQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -88,13 +88,14 @@ public class Counter {
         };
     }
 
-    public List<CheckInCountersDTO> consumePassengerQueue() {
+    public List<CheckInCountersDTO> consumePassengerQueue(List<CheckInHistoryInfo> checkInHistoryInfoList) {
         List<CheckInCountersDTO> toRet = new ArrayList<>();
         for (int cId = getCounterId(); cId < getCounterId() + rangeLength; cId++) {
             Passenger passenger = passengerQueue.poll();
             CheckInCountersDTO passengerData = new CheckInCountersDTO(cId);
 
             if (passenger != null) {
+                checkInHistoryInfoList.add(new CheckInHistoryInfo(sector.getName(), cId, passenger.getAirlineCode(), passenger.getFlightCode(), passenger.getBookingCode()));
                 passenger.setStatus(PassengerStatus.CHECKED_IN);
                 passenger.setCheckedInAtCounter(cId);
                 passengerData.setPassenger(passenger);
@@ -147,7 +148,7 @@ public class Counter {
         return passengerQueue.contains(passenger);
     }
 
-    public int addPassengerToQueue(Passenger passenger) {
+    public void addPassengerToQueue(Passenger passenger) {
         passengerQueue.add(passenger);
         passenger.setStatus(PassengerStatus.ON_QUEUE);
 
@@ -159,7 +160,6 @@ public class Counter {
                 .setLastCounter(passenger.getCounterFrom().getRangeLength()+passenger.getCounterFrom().getCounterId()-1);
         airport.notifyAirline(passenger.getAirlineCode(), eventsResponseBuilder.build());
 
-        return passengerQueue.size() - 1;
     }
 
     /*
