@@ -17,3 +17,5 @@ sh passengerClient.sh -DserverAddress=localhost:50051 -Daction=passengerCheckin 
 #sh passengerClient.sh -DserverAddress=localhost:50051 -Daction=passengerCheckin -Dbooking=ghi013 -Dsector=C -Dcounter=1
 sh passengerClient.sh -DserverAddress=localhost:50051 -Daction=passengerCheckin -Dbooking=ghi014 -Dsector=C -Dcounter=1
 sh passengerClient.sh -DserverAddress=localhost:50051 -Daction=passengerCheckin -Dbooking=ghi015 -Dsector=C -Dcounter=1
+
+sh counterClient.sh -DserverAddress=localhost:50051 -Daction=checkinCounters -Dsector=C -DcounterFrom=1 -Dairline=americanairlines

@@ -85,6 +85,7 @@ public class CountersStateAction extends Action {
                     StandardOpenOption.WRITE,
                     StandardOpenOption.APPEND
             );
+            System.out.println("Out path file created succesfully");
         } catch (IOException | InvalidPathException e) {
             System.err.println(Util.IO_ERROR_MESSAGE);
             System.exit(1);

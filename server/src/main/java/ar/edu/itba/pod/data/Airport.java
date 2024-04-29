@@ -106,6 +106,9 @@ public class Airport {
     //Query Service
     public List<CounterState> getAllCountersState(){
         synchronized (sectorLock){
+            if (sectors.values().isEmpty()) {
+                throw new SectorsIsEmptyException();
+            }
             List<CounterState> counterStates = new ArrayList<>();
             for(Sector sector : sectors.values()){
                 counterStates.addAll(getCountersState(sector.getName()));
@@ -117,12 +120,11 @@ public class Airport {
     public List<CounterState> getCountersState(String sectorName) {
         synchronized (sectorLock) {
             if (!sectors.containsKey(sectorName)) {
-                throw new IllegalArgumentException();
+                throw new SectorNotFoundException(sectorName);
             }
 
             if (sectors.get(sectorName).getCounters().isEmpty()) {
-                //TODO implementar
-                return null;
+                throw new NoCountersException(sectorName);
             }
             List<CounterState> counterStates = new ArrayList<>();
             Sector sector = sectors.get(sectorName);
