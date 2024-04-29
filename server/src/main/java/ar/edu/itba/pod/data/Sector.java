@@ -164,4 +164,7 @@ public class Sector {
                 .build();
     }
 
+    public BlockingQueue<AirlineCounterRequest> getAirlineBlockingQueue() {
+        return airlineBlockingQueue;
+    }
 }

@@ -1,7 +1,6 @@
 package ar.edu.itba.pod.data;
 
 import ar.edu.itba.pod.checkIn.PassengerStatus;
-import ar.edu.itba.pod.data.Exceptions.PassengerQueueNotEmptyException;
 import ar.edu.itba.pod.data.Exceptions.StillPassengersInLineException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 
@@ -49,14 +48,11 @@ public class Counter {
     }
 
     public void freeCounter(){
-        if (!passengerQueue.isEmpty()) {
-            throw new PassengerQueueNotEmptyException();
-        }
         if (startOfRange) {
             // Aca se puede chequear si quedaban pasajeros en la fila
             for (Flight flight : flights) {
                 if (!flight.getPassengerList().isEmpty()) {
-                    throw new StillPassengersInLineException();
+                    throw new StillPassengersInLineException(passengerQueue.size());
                 }
             }
             startOfRange = false;

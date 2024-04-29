@@ -42,7 +42,16 @@ public class GlobalExceptionHandlerInterceptor implements ServerInterceptor {
             Map.entry(SectorNotFoundException.class, Code.NOT_FOUND),
             Map.entry(CounterCountShouldBePositiveException.class, Code.FAILED_PRECONDITION),
             Map.entry(FlightCodeAlreadyExistsInOtherAirlineException.class, Code.ALREADY_EXISTS),
-            Map.entry(PassengerAlreadyExistsException.class, Code.FAILED_PRECONDITION)
+            Map.entry(PassengerAlreadyExistsException.class, Code.FAILED_PRECONDITION),
+            Map.entry(SectorsIsEmptyException.class, Code.NOT_FOUND),
+            Map.entry(AirlineNotMatchesCounterRangeException.class, Code.FAILED_PRECONDITION),
+            Map.entry(AirlineNotFoundException.class, Code.NOT_FOUND),
+            Map.entry(AirlineNotMatchesFlight.class, Code.FAILED_PRECONDITION),
+            Map.entry(NoPassengersInFlightException.class, Code.FAILED_PRECONDITION),
+            Map.entry(BadCounterRangeException.class, Code.FAILED_PRECONDITION),
+            Map.entry(CounterRangeAlreadyAssignedToflight.class, Code.ALREADY_EXISTS),
+            Map.entry(FlightCodeAlreadyInCounterRangeQueue.class, Code.ALREADY_EXISTS),
+            Map.entry(StillPassengersInLineException.class, Code.FAILED_PRECONDITION)
         );
 
         private void handleException(RuntimeException exception, ServerCall<T, R> serverCall, Metadata headers) {
