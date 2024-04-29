@@ -45,8 +45,29 @@ message Flights{
 }
 
 message CheckInHistoryRequest {
-    string sectorName=1;
-    string airlineName=2;
+    oneof request{
+        CheckInHistoryRequestWithSector sector = 1;
+        CheckInHistoryRequestWithAirline airline = 2;
+        CheckInHistoryRequestWithOutSectorNorAirline noSectorNorAirline = 3;
+        CheckInHistoryRequestWithSectorAndAirline sectorAndAirline = 4;
+    }
+}
+
+message CheckInHistoryRequestWithSector {
+    string sectorName = 1;
+}
+
+message CheckInHistoryRequestWithAirline {
+    string airlineName = 1;
+}
+
+message CheckInHistoryRequestWithOutSectorNorAirline {
+
+}
+
+message CheckInHistoryRequestWithSectorAndAirline {
+    string sectorName = 1;
+    string airlineName = 2;
 }
 
 message CheckInHistoryResponse {

@@ -7,7 +7,11 @@ import java.util.List;
 
 public enum QueryActions {
     COUNTERS_STATE_NO_SECTOR("queryCounters", new CountersStateAction(List.of("outPath"), CountersStateAction.Type.NO_SECTOR)),
-    COUNTERS_STATE_SECTOR("queryCounters", new CountersStateAction(List.of("sector","outPath"), CountersStateAction.Type.SECTOR)), CHECK_IN_HISTORY("checkins", new CheckInHistoryAction(List.of("sector", "airline")));
+    COUNTERS_STATE_SECTOR("queryCounters", new CountersStateAction(List.of("sector","outPath"), CountersStateAction.Type.SECTOR)),
+    CHECK_IN_HISTORY_WITH_SECTOR("checkins", new CheckInHistoryAction(List.of("sector", "outPath"), CheckInHistoryAction.Type.WITH_SECTOR)),
+    CHECK_IN_HISTORY_WITH_AIRLINE("checkins", new CheckInHistoryAction(List.of("airline","outPath"), CheckInHistoryAction.Type.WITH_AIRLINE)),
+    CHECK_IN_HISTORY_WITHOUT_SECTOR_NOR_AIRLINE("checkins", new CheckInHistoryAction(List.of("outPath"), CheckInHistoryAction.Type.WITHOUT_SECTOR_NOR_AIRLINE)),
+    CHECK_IN_HISTORY_WITH_SECTOR_AND_AIRLINE("checkins", new CheckInHistoryAction(List.of("sector", "airline","outPath"), CheckInHistoryAction.Type.WITH_SECTOR_AND_AIRLINE));
 
 
     private final String actionName;
@@ -26,6 +30,21 @@ public enum QueryActions {
                 return COUNTERS_STATE_SECTOR;
             } else {
                 return COUNTERS_STATE_NO_SECTOR;
+            }
+        }
+
+        if (actionName.equals("checkins")) {
+            boolean hasSector = System.getProperty("sector") != null;
+            boolean hasAirline = System.getProperty("airline") != null;
+
+            if (hasSector && hasAirline) {
+                return CHECK_IN_HISTORY_WITH_SECTOR_AND_AIRLINE;
+            } else if (hasSector) {
+                return CHECK_IN_HISTORY_WITH_SECTOR;
+            } else if (hasAirline) {
+                return CHECK_IN_HISTORY_WITH_AIRLINE;
+            } else {
+                return CHECK_IN_HISTORY_WITHOUT_SECTOR_NOR_AIRLINE;
             }
         }
 

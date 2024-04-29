@@ -1,6 +1,7 @@
 package ar.edu.itba.pod.servants;
 
 import ar.edu.itba.pod.data.Airport;
+import ar.edu.itba.pod.data.Utils.CheckInHistoryInfo;
 import ar.edu.itba.pod.query.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
@@ -51,20 +52,36 @@ public class QueryServant extends QueryServiceGrpc.QueryServiceImplBase {
     public void getCheckInHistory(CheckInHistoryRequest request, StreamObserver<CheckInHistoryResponse> responseObserver) {
 
         try {
-//            CheckInHistoryResponse.Builder response = CheckInHistoryResponse.newBuilder();
-//            response.addAllCheckInsHistory(
-//                    airport.getCheckInHistory(request.getSectorName(), request.getAirlineName()).stream().
-//                            map(checkInHistoryInfo -> CheckInHistory.newBuilder()
-//                            .setSectorName(checkInHistoryInfo.getSectorName())
-//                            .setCounterCode(checkInHistoryInfo.getCounterId())
-//                            .setAirlineName(checkInHistoryInfo.getAirlineName())
-//                            .setFlightCode(checkInHistoryInfo.getFlightCode())
-//                            .setBookingCode(checkInHistoryInfo.getBookingCode())
-//                            .build()
-//                    ).toList()
-//            );
-//            responseObserver.onNext(response.build());
-//            responseObserver.onCompleted();
+            CheckInHistoryResponse.Builder response = CheckInHistoryResponse.newBuilder();
+
+            List<CheckInHistoryInfo> checkInHistoryList = null;
+
+            if (request.hasSectorAndAirline()){
+                checkInHistoryList = airport.getCheckInHistoryWithSectorAndAirline(request.getSectorAndAirline().getSectorName(),request.getSectorAndAirline().getAirlineName());
+            }else if (request.hasAirline()) {
+                checkInHistoryList = airport.getCheckInHistoryWithAirline(request.getAirline().getAirlineName());
+            }else if (request.hasSector()){
+                checkInHistoryList = airport.getCheckInHistoryWithSector(request.getSector().getSectorName());
+            } else if (request.hasNoSectorNorAirline()) {
+                checkInHistoryList = airport.getCheckInHistory();
+            }else {
+                throw new IllegalArgumentException();
+            }
+
+            assert checkInHistoryList != null;
+            response.addAllCheckInsHistory(
+                    checkInHistoryList.stream().
+                            map(checkInHistoryInfo -> CheckInHistory.newBuilder()
+                            .setSectorName(checkInHistoryInfo.getSectorName())
+                            .setCounterCode(checkInHistoryInfo.getCounterId())
+                            .setAirlineName(checkInHistoryInfo.getAirlineName())
+                            .setFlightCode(checkInHistoryInfo.getFlightCode())
+                            .setBookingCode(checkInHistoryInfo.getBookingCode())
+                            .build()
+                    ).toList()
+            );
+            responseObserver.onNext(response.build());
+            responseObserver.onCompleted();
         }catch (IllegalArgumentException exception){
             responseObserver.onError(Status.INVALID_ARGUMENT.asRuntimeException());
         }

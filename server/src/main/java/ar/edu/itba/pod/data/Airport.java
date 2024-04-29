@@ -25,6 +25,7 @@ public class Airport {
     private int globalCounterNumber = 1;
     private static final int COUNTERS_INCORRECT_COUNT = 0; //Just not a magic number
     private static final int BOOKING_CODE_LENGTH = 6;
+    private final List<CheckInHistoryInfo> checkInHistoryList = new ArrayList<>();
 
     private Airport(){
 
@@ -153,18 +154,49 @@ public class Airport {
             return counterStates;
         }
     }
+    public List<CheckInHistoryInfo> getCheckInHistory() {
+        synchronized (sectorLock) {
+            return checkInHistoryList;
+        }
+    }
 
-    public List<CheckInHistoryInfo> getCheckInHistory(String sectorName, String airlineName ){
+    public List<CheckInHistoryInfo> getCheckInHistoryWithSector(String sectorName){
         synchronized (sectorLock){
             if (!sectors.containsKey(sectorName)){
                 throw new IllegalArgumentException();
             }
             List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();
-            for (Counter counter: sectors.get(sectorName).getCounters()){
-                //TODO ordenar clases
-//                for (CheckIn checkIn: counter.getCheckIns()){
-//                    checkInHistoryInfos.add(new CheckInHistoryInfo(checkIn.getBookingCode(),checkIn.getFlightCode(),checkIn.getAirlineCode(),sectorName,counter.getCounterId()));
-//                }
+            for (CheckInHistoryInfo checkInHistoryInfo: checkInHistoryList){
+                if (checkInHistoryInfo.getSectorName().equals(sectorName)){
+                    checkInHistoryInfos.add(checkInHistoryInfo);
+                }
+            }
+            return checkInHistoryInfos;
+        }
+    }
+
+    public List<CheckInHistoryInfo> getCheckInHistoryWithAirline(String airlineName){
+        synchronized (sectorLock){
+            List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();
+            for (CheckInHistoryInfo checkInHistoryInfo: checkInHistoryList){
+                if (checkInHistoryInfo.getAirlineName().equals(airlineName)){
+                    checkInHistoryInfos.add(checkInHistoryInfo);
+                }
+            }
+            return checkInHistoryInfos;
+        }
+    }
+
+public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sectorName, String airlineName){
+        synchronized (sectorLock){
+            if (!sectors.containsKey(sectorName)){
+                throw new IllegalArgumentException();
+            }
+            List<CheckInHistoryInfo> checkInHistoryInfos = new ArrayList<>();
+            for (CheckInHistoryInfo checkInHistoryInfo: checkInHistoryList){
+                if (checkInHistoryInfo.getSectorName().equals(sectorName) && checkInHistoryInfo.getAirlineName().equals(airlineName)){
+                    checkInHistoryInfos.add(checkInHistoryInfo);
+                }
             }
             return checkInHistoryInfos;
         }
@@ -211,7 +243,7 @@ public class Airport {
                 }
             }
             // Esto se mete en el sector y consume la cola adecuada
-            return sectors.get(sectorName).checkInCounters(counterFrom, airlines.get(airlineName));
+            return sectors.get(sectorName).checkInCounters(counterFrom, airlines.get(airlineName), checkInHistoryList);
         }
     }
 

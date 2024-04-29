@@ -7,6 +7,7 @@ import ar.edu.itba.pod.data.Exceptions.AirlineNotMatchesCounterRangeException;
 import ar.edu.itba.pod.data.Exceptions.NotRangeAssignedException;
 import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
+import ar.edu.itba.pod.data.Utils.CheckInHistoryInfo;
 import ar.edu.itba.pod.events.EventStatus;
 import ar.edu.itba.pod.events.EventsResponse;
 import org.checkerframework.checker.units.qual.C;
@@ -180,7 +181,7 @@ public class Sector {
     }
 
 
-    public List<CheckInCountersDTO> checkInCounters(int counterFrom, Airline airline) {
+    public List<CheckInCountersDTO> checkInCounters(int counterFrom, Airline airline, List<CheckInHistoryInfo> checkInHistoryInfoList) {
         // Aca quiero fijarme si en counterFrom hay un rango asignado y en ese caso quiero sacar cosas de la cola
         for (Counter counter : counters) {
             if (counter.getCounterId() == counterFrom) {
@@ -190,7 +191,7 @@ public class Sector {
                 if (!counter.getAirline().equals(airline.getAirlineName())) {
                     throw new AirlineNotMatchesCounterRangeException();
                 }
-                return counter.consumePassengerQueue();
+                return counter.consumePassengerQueue(checkInHistoryInfoList);
             }
         }
         return Collections.emptyList();
