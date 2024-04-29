@@ -1,7 +1,6 @@
 package ar.edu.itba.pod.data;
 
 import ar.edu.itba.pod.checkIn.PassengerStatus;
-import ar.edu.itba.pod.data.Exceptions.PassengerQueueNotEmptyException;
 import ar.edu.itba.pod.data.Exceptions.StillPassengersInLineException;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 import ar.edu.itba.pod.data.Utils.CheckInHistoryInfo;
@@ -22,6 +21,7 @@ public class Counter {
     private boolean startOfRange = false;
     private int rangeLength = 0;
     private BlockingQueue<Passenger> passengerQueue;
+    private final Object passangerLock = "passangerLock";
     
     public Counter(int counterId, Sector sector){
         this.counterId = counterId;
@@ -52,14 +52,11 @@ public class Counter {
     }
 
     public void freeCounter(){
-        if (!passengerQueue.isEmpty()) {
-            throw new PassengerQueueNotEmptyException();
-        }
         if (startOfRange) {
             // Aca se puede chequear si quedaban pasajeros en la fila
             for (Flight flight : flights) {
                 if (!flight.getPassengerList().isEmpty()) {
-                    throw new StillPassengersInLineException();
+                    throw new StillPassengersInLineException(passengerQueue.size());
                 }
             }
             startOfRange = false;
@@ -120,10 +117,12 @@ public class Counter {
     }
 
     public Integer getQueueSize() {
-        if (passengerQueue == null) {
-            return 0;
+        synchronized (passangerLock){
+            if (passengerQueue == null) {
+                return 0;
+            }
+            return passengerQueue.size();
         }
-        return passengerQueue.size();
     }
 
     public int getPeopleInFront(Passenger passenger) {

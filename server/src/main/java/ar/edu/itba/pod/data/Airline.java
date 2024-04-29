@@ -53,25 +53,31 @@ public class Airline {
     }
 
     public void notifyEvent(EventsResponse eventResponse){
-        if(eventsQueue != null){
-            eventsQueue.add(eventResponse);
+        synchronized (eventsLock){
+            if(eventsQueue != null){
+                eventsQueue.add(eventResponse);
+            }
         }
     }
 
     public BlockingQueue<EventsResponse> registerForEvents(){
-        if(eventsQueue != null){
-            throw new AirlineAlreadyRegisteredForEventsException();
+        synchronized (eventsLock){
+            if(eventsQueue != null){
+                throw new AirlineAlreadyRegisteredForEventsException();
+            }
+            eventsQueue = new LinkedBlockingQueue<>();
+            return eventsQueue;
         }
-        eventsQueue = new LinkedBlockingQueue<>();
-        return eventsQueue;
     }
 
     public void unregisterForEvents(){
-        if(eventsQueue == null){
-            throw new AirlineNotRegisteredException();
+        synchronized (eventsLock){
+            if(eventsQueue == null){
+                throw new AirlineNotRegisteredException();
+            }
+            EventsResponse.Builder eventsResponse = EventsResponse.newBuilder().setStatus(EventStatus.DESTROYED);
+            eventsQueue.add(eventsResponse.build());
+            eventsQueue = null;
         }
-        EventsResponse.Builder eventsResponse = EventsResponse.newBuilder().setStatus(EventStatus.DESTROYED);
-        eventsQueue.add(eventsResponse.build());
-        eventsQueue = null;
     }
 }

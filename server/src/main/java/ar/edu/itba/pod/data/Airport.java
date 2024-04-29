@@ -7,6 +7,7 @@ import ar.edu.itba.pod.checkIn.PassengerStatus;
 import ar.edu.itba.pod.counterReservation.AssignCountersResponse;
 import ar.edu.itba.pod.counterReservation.ListPendingAssignmentsResponse;
 import ar.edu.itba.pod.data.Exceptions.*;
+import ar.edu.itba.pod.data.Utils.AirlineCounterRequest;
 import ar.edu.itba.pod.data.Utils.CheckInCountersDTO;
 import ar.edu.itba.pod.data.Utils.CheckInHistoryInfo;
 import ar.edu.itba.pod.data.Utils.CounterState;
@@ -49,6 +50,7 @@ public class Airport {
 
     public Collection<Sector> getSectors(){
         synchronized (sectorLock){
+            if (sectors.isEmpty()) throw new SectorsIsEmptyException();
             return sectors.values();
         }
     }
@@ -206,12 +208,14 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
     public List<CounterRange> getCountersInRange(String sectorName, int min, int max){
         synchronized (sectorLock){
             if(!sectors.containsKey(sectorName)){
-                throw new IllegalArgumentException();
+                throw new SectorNotFoundException(sectorName);
             }
             if( (max-min) >= 1 ){
-                return sectors.get(sectorName).getCountersInRange(min,max);
+                List<CounterRange> toRet = sectors.get(sectorName).getCountersInRange(min,max);
+                if (toRet.isEmpty()) throw new BadCounterRangeException(min, max);
+                return toRet;
             }else{
-                throw new IllegalArgumentException();
+                throw new BadCounterRangeException(min, max);
             }
         }
     }
@@ -219,13 +223,37 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
     public AssignCountersResponse assignCounters(String sectorName, int counterCount, String airlineString, List<String> flights ){
         synchronized (sectorLock){
             if(!sectors.containsKey(sectorName)){
-                throw new IllegalArgumentException();
+                throw new SectorNotFoundException(sectorName);
             }
             if(!airlines.containsKey(airlineString)){
-                throw new IllegalArgumentException();
+                throw new AirlineNotFoundException(airlineString);
             }
-            //TODO No se agregaron pasajeros esperados con el código de vuelo, para al menos uno de los vuelos solicitados
-            //TODO check that all flights EXISTS AND have passangers waiting (ARRIBA)
+            for (String flight : flights) {
+                for (Airline airline : airlines.values()) {
+                    if(airline.getFlights().containsKey(flight)) {
+                        if (!Objects.equals(airline.getAirlineName(), airlineString)) {
+                            throw new AirlineNotMatchesFlight(flight, airline.getAirlineName());
+                        }
+                        if (airline.getFlight(flight).getPassengerList().isEmpty()){
+                            throw new NoPassengersInFlightException(flight);
+                        }
+                    }
+                }
+            }
+            Sector sector = sectors.get(sectorName);
+            for (Counter counter : sector.getCounters()) {
+                Optional<Flight> flight = counter.getFlights().stream().filter(f -> flights.contains(f.getFlightCode())).findFirst();
+                if (flight.isPresent() && flight.get().getAirlineName().equals(airlineString)) {
+                    throw new CounterRangeAlreadyAssignedToflight(flight.get().getFlightCode());
+                }
+            }
+            for (AirlineCounterRequest air : sector.getAirlineBlockingQueue()) {
+                for (String f : air.getFlights()) {
+                    if (flights.contains(f)) {
+                        throw new FlightCodeAlreadyInCounterRangeQueue(f);
+                    }
+                }
+            }
             return sectors.get(sectorName).assignCounters(counterCount, airlines.get(airlineString), flights);
         }
 
@@ -236,7 +264,6 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
             if(!sectors.containsKey(sectorName)){
                 throw new IllegalArgumentException();
             }
-            // TODO: Esto es feisimo
             for (Counter counter: sectors.get(sectorName).getCounters()) {
                 if (counter.getCounterId() == counterFrom && !counter.getAirline().equals(airlineName)) {
                     throw new IllegalArgumentException();
@@ -247,21 +274,20 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
         }
     }
 
-
-
     public void freeCounters(String sectorName, int counterFrom, String airlineName){
         synchronized (sectorLock){
-            //TODO falta ver si existen pasajeros esperando a ser atendidos en la cola del rango
+            if(!sectors.containsKey(sectorName)){
+                throw new SectorNotFoundException(sectorName);
+            }
             if(!airlines.containsKey(airlineName)){
-                throw new IllegalArgumentException();
+                throw new AirlineNotFoundException(airlineName);
             }
-            if (!sectors.containsKey(sectorName) || sectors.get(sectorName).getCounters().isEmpty()){
-                throw new IllegalArgumentException();
-            }
-            // TODO: Esto es feisimo
+
             for (Counter counter: sectors.get(sectorName).getCounters()) {
-                if (counter.getCounterId() == counterFrom && !counter.getAirline().equals(airlineName)) {
-                    throw new IllegalArgumentException();
+                if (counter.getCounterId() == counterFrom) {
+                    if(!counter.getAirline().equals(airlineName)) {
+                        throw new AirlineNotMatchesCounterRangeException();
+                    }
                 }
             }
             sectors.get(sectorName).freeCounters(counterFrom, airlines.get(airlineName));
@@ -270,71 +296,74 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
 
     public CheckInCountersResponse getPassengerCheckinInfo(String booking) {
         // A partir de una booking conseguir el vuelo, aerolinea, counters y gente en la cola
-        CheckInCountersResponse.Builder pDTO = CheckInCountersResponse.newBuilder();
-        Passenger passenger = passengers.get(booking);
+        synchronized (sectorLock) {
+            CheckInCountersResponse.Builder pDTO = CheckInCountersResponse.newBuilder();
+            Passenger passenger = passengers.get(booking);
 
-        if (passenger == null) {
-            throw new BookingNotFoundException();
+            if (passenger == null) {
+                throw new BookingNotFoundException();
+            }
+
+            Sector sector = sectors.get(passenger.getSector());
+            Counter counter = passenger.getCounterFrom();
+
+            if (!counter.isStartOfRange()) {
+                throw new NotRangeAssignedException();
+            }
+            if (!counter.containsFlightCode(passenger.getFlightCode())) {
+                throw new FlightNotMatchesCounterException();
+            }
+
+            pDTO.setAirline(counter.getAirline());
+            pDTO.setSector(sector.getName());
+            pDTO.setQueueSize(counter.getQueueSize());
+            pDTO.setFromCounter(counter.getCounterId());
+            pDTO.setToCounter(counter.getCounterId() + counter.getRangeLength() - 1);
+
+            pDTO.setFlightCode(passenger.getFlightCode());
+            return pDTO.build();
         }
-
-        Sector sector = sectors.get(passenger.getSector());
-        Counter counter = passenger.getCounterFrom();
-
-        if (!counter.isStartOfRange()) {
-            throw new NotRangeAssignedException();
-        }
-        if (!counter.containsFlightCode(passenger.getFlightCode())) {
-            throw new FlightNotMatchesCounterException();
-        }
-
-        pDTO.setAirline(counter.getAirline());
-        pDTO.setSector(sector.getName());
-        pDTO.setQueueSize(counter.getQueueSize());
-        pDTO.setFromCounter(counter.getCounterId());
-        pDTO.setToCounter(counter.getCounterId() + counter.getRangeLength() - 1);
-
-        pDTO.setFlightCode(passenger.getFlightCode());
-        return pDTO.build();
     }
 
     public GetInlineResponse getPassengerInLine(String booking, String sectorName, int counterNumber) {
-        Passenger passenger = passengers.get(booking);
-        GetInlineResponse.Builder builder = GetInlineResponse.newBuilder();
+        synchronized (sectorLock) {
+            Passenger passenger = passengers.get(booking);
+            GetInlineResponse.Builder builder = GetInlineResponse.newBuilder();
 
-        if (passenger == null) {
-            throw new BookingNotFoundException();
-        }
-        if (passenger.getStatus() == PassengerStatus.CHECKED_IN) {
-            throw new PassengerAlreadyCheckedIn();
-        }
-        if (!sectors.containsKey(sectorName)) {
-            throw new SectorNotFoundException(sectorName);
-        }
-
-        Sector sector = sectors.get(sectorName);
-        for (Counter counter : sector.getCounters()) {
-            if (counter.getCounterId() == counterNumber) {
-                if (!counter.isStartOfRange()) {
-                    throw new BadCounterIdException();
-                }
-                if (!Objects.equals(counter.getAirline(), passenger.getAirlineCode())) {
-                    throw new AirlineNotMatchesCounterRangeException();
-                }
-                if (counter.checkIfPassengerInQueue(passenger)) {
-                    throw new PassengerAlreadyInQueue();
-                }
-                counter.addPassengerToQueue(passenger);
-                builder.setQueueSize(counter.getPeopleInFront(passenger))
-                        .setCounterFrom(counter.getCounterId())
-                        .setCounterTo(counter.getCounterId() + counter.getRangeLength() - 1);
+            if (passenger == null) {
+                throw new BookingNotFoundException();
             }
-        }
-        return builder.setFlightCode(passenger.getFlightCode())
-                .setBooking(booking)
-                .setAirline(passenger.getAirlineCode())
-                .setSector(sectorName)
-                .build();
+            if (passenger.getStatus() == PassengerStatus.CHECKED_IN) {
+                throw new PassengerAlreadyCheckedIn();
+            }
+            if (!sectors.containsKey(sectorName)) {
+                throw new SectorNotFoundException(sectorName);
+            }
 
+            Sector sector = sectors.get(sectorName);
+            for (Counter counter : sector.getCounters()) {
+                if (counter.getCounterId() == counterNumber) {
+                    if (!counter.isStartOfRange()) {
+                        throw new BadCounterIdException();
+                    }
+                    if (!Objects.equals(counter.getAirline(), passenger.getAirlineCode())) {
+                        throw new AirlineNotMatchesCounterRangeException();
+                    }
+                    if (counter.checkIfPassengerInQueue(passenger)) {
+                        throw new PassengerAlreadyInQueue();
+                    }
+                    counter.addPassengerToQueue(passenger);
+                    builder.setQueueSize(counter.getPeopleInFront(passenger))
+                            .setCounterFrom(counter.getCounterId())
+                            .setCounterTo(counter.getCounterId() + counter.getRangeLength() - 1);
+                }
+            }
+            return builder.setFlightCode(passenger.getFlightCode())
+                    .setBooking(booking)
+                    .setAirline(passenger.getAirlineCode())
+                    .setSector(sectorName)
+                    .build();
+        }
     }
 
     public ListPendingAssignmentsResponse listPendingAssignments(String sectorName){
@@ -347,51 +376,53 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
     }
 
     public GetPassengerStatusResponse getPassengerStatus(String booking) {
-        Passenger passenger = passengers.get(booking);
-        GetPassengerStatusResponse.Builder builder = GetPassengerStatusResponse.newBuilder();
+        synchronized (sectorLock) {
+            Passenger passenger = passengers.get(booking);
+            GetPassengerStatusResponse.Builder builder = GetPassengerStatusResponse.newBuilder();
 
-        if (passenger == null) {
-            throw new BookingNotFoundException();
+            if (passenger == null) {
+                throw new BookingNotFoundException();
+            }
+
+            builder.setFlightCode(passenger.getFlightCode());
+            if (passenger.getCounterFrom() == null) {
+                throw new NotRangeAssignedException();
+            }
+
+            Sector sector = sectors.get(passenger.getSector());
+            Counter counter = passenger.getCounterFrom();
+
+            builder.setAirline(counter.getAirline()).
+            setSector(sector.getName()).
+            setQueueSize(counter.getPeopleInFront(passenger)).
+            setCounter(counter.getCounterId()).
+            setCounterRange(counter.getRangeLength()).
+            setStatus(passenger.getStatus());
+
+            if (passenger.getStatus() == PassengerStatus.CHECKED_IN) {
+                builder.setCounter(passenger.getCheckedInAtCounter());
+            }
+            return builder.build();
         }
-
-        builder.setFlightCode(passenger.getFlightCode());
-        if (passenger.getCounterFrom() == null) {
-            throw new NotRangeAssignedException();
-        }
-
-        Sector sector = sectors.get(passenger.getSector());
-        Counter counter = passenger.getCounterFrom();
-
-        builder.setAirline(counter.getAirline()).
-        setSector(sector.getName()).
-        setQueueSize(counter.getPeopleInFront(passenger)).
-        setCounter(counter.getCounterId()).
-        setCounterRange(counter.getRangeLength()).
-        setStatus(passenger.getStatus());
-
-        if (passenger.getStatus() == PassengerStatus.CHECKED_IN) {
-            builder.setCounter(passenger.getCheckedInAtCounter());
-        }
-        return builder.build();
     }
 
     public BlockingQueue<EventsResponse> RegisterAirlineForEvents(String airline){
         if(!airlines.containsKey(airline)){
-            throw new AirlineNotFoundException();
+            throw new AirlineNotFoundException(airline);
         }
         return airlines.get(airline).registerForEvents();
     }
 
     public void UnregisterAirlineForEvents(String airline){
         if(!airlines.containsKey(airline)){
-            throw new AirlineNotFoundException();
+            throw new AirlineNotFoundException(airline);
         }
         airlines.get(airline).unregisterForEvents();
     }
 
     public void notifyAirline(String airline, EventsResponse event){
         if(!airlines.containsKey(airline)){
-            throw new AirlineNotFoundException();
+            throw new AirlineNotFoundException(airline);
         }
         airlines.get(airline).notifyEvent(event);
     }

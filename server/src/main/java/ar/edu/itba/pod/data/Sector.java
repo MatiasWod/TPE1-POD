@@ -57,7 +57,7 @@ public class Sector {
                     countersInRange.add(current);
                     lastCounterAirline = counter.getAirline();
                 }
-            }else if(counter.getCounterId() > max){
+            }if(counter.getCounterId() >= max){
                 break;
             }
         }
@@ -141,7 +141,6 @@ public class Sector {
                     addFlightsToCounters(startPosition, counterFrom,aux.getFlights(),aux.getAirline());
                     airlineBlockingQueue.remove();
 
-                    //7 counters in Sector C for flights AA888|AA999 is pending with 4 other pendings ahead
                     int airlinesAhead = 0;
                     for(AirlineCounterRequest airlineRequest : airlineBlockingQueue){
                         //Notify the airlines
@@ -218,4 +217,7 @@ public class Sector {
                 .build();
     }
 
+    public BlockingQueue<AirlineCounterRequest> getAirlineBlockingQueue() {
+        return airlineBlockingQueue;
+    }
 }

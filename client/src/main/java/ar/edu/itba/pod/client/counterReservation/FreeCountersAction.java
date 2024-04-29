@@ -31,6 +31,12 @@ public class FreeCountersAction extends Action {
             stub.freeCounters(freeCountersRequestBuilder.build());
             System.out.println("FINISHED");
         } catch (StatusRuntimeException exception) {
+            if (exception.getStatus().getCode() == Status.ALREADY_EXISTS.getCode() ||
+                    exception.getStatus().getCode() == Status.NOT_FOUND.getCode() ||
+                    exception.getStatus().getCode() == Status.FAILED_PRECONDITION.getCode()) {
+                System.out.println(exception.getMessage());
+                System.exit(1);
+            }
             if (exception.getStatus() == Status.INVALID_ARGUMENT) {
                 throw new IllegalArgumentException();
             } else if (exception.getStatus().getCode() == Status.UNAVAILABLE.getCode()) {
