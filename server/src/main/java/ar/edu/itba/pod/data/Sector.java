@@ -184,7 +184,7 @@ public class Sector {
         for (Counter counter : counters) {
             if (counter.getCounterId() == counterFrom) {
                 if (!counter.isStartOfRange()) {
-                    throw new NotRangeAssignedException();
+                    throw new NotRangeAssignedException(counterFrom);
                 }
                 if (!counter.getAirline().equals(airline.getAirlineName())) {
                     throw new AirlineNotMatchesCounterRangeException();

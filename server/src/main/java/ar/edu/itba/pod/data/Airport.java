@@ -275,11 +275,11 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
     public List<CheckInCountersDTO> checkInCounters(String sectorName, int counterFrom, String airlineName){
         synchronized (sectorLock){
             if(!sectors.containsKey(sectorName)){
-                throw new IllegalArgumentException();
+                throw new SectorNotFoundException(sectorName);
             }
             for (Counter counter: sectors.get(sectorName).getCounters()) {
-                if (counter.getCounterId() == counterFrom && !counter.getAirline().equals(airlineName)) {
-                    throw new IllegalArgumentException();
+                if (counter.getCounterId() == counterFrom && !counter.isStartOfRange()) {
+                    throw new NotRangeAssignedException(counterFrom);
                 }
             }
             // Esto se mete en el sector y consume la cola adecuada
@@ -321,7 +321,7 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
             Counter counter = passenger.getCounterFrom();
 
             if (!counter.isStartOfRange()) {
-                throw new NotRangeAssignedException();
+                throw new NotRangeAssignedException(counter.getCounterId());
             }
             if (!counter.containsFlightCode(passenger.getFlightCode())) {
                 throw new FlightNotMatchesCounterException(passenger.getFlightCode(), counter.getCounterId(), sector.getName());
@@ -399,7 +399,7 @@ public List<CheckInHistoryInfo> getCheckInHistoryWithSectorAndAirline(String sec
 
             builder.setFlightCode(passenger.getFlightCode());
             if (passenger.getCounterFrom() == null) {
-                throw new NotRangeAssignedException();
+                throw new NotRangeAssignedToFlightException(passenger.getFlightCode());
             }
 
             Sector sector = sectors.get(passenger.getSector());
