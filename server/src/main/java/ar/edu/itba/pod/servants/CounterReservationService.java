@@ -46,7 +46,9 @@ public class CounterReservationService extends counterReservationServiceGrpc.cou
                             });
 
                             countersInformationBuilder.addAllFlights(flightsList);
-                            countersInformationBuilder.setPeople(780556); //TODO PONER ESTO
+                            if(counterRange.getFirstCounter().isStartOfRange()){
+                                countersInformationBuilder.setPeople(counterRange.getFirstCounter().getQueueSize());
+                            }
                             return countersInformationBuilder.build();
                         }).collect(Collectors.toList())
         ).build();
