@@ -56,7 +56,7 @@ public class Sector {
                     countersInRange.add(current);
                     lastCounterAirline = counter.getAirline();
                 }
-            }else if(counter.getCounterId() > max){
+            }if(counter.getCounterId() >= max){
                 break;
             }
         }

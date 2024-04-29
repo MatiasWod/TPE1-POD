@@ -22,6 +22,7 @@ public class Counter {
     private boolean startOfRange = false;
     private int rangeLength = 0;
     private BlockingQueue<Passenger> passengerQueue;
+    private final Object passangerLock = "passangerLock";
     
     public Counter(int counterId, Sector sector){
         this.counterId = counterId;
@@ -119,10 +120,12 @@ public class Counter {
     }
 
     public Integer getQueueSize() {
-        if (passengerQueue == null) {
-            return 0;
+        synchronized (passangerLock){
+            if (passengerQueue == null) {
+                return 0;
+            }
+            return passengerQueue.size();
         }
-        return passengerQueue.size();
     }
 
     public int getPeopleInFront(Passenger passenger) {
