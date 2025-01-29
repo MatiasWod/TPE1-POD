@@ -1,6 +1,7 @@
 # TPE1-POD
-
 ---
+
+Implementacion de un sistema remoto thread-safe para la asignación de mostradores de check-in de un aeropuerto permitiendo notificar a las aerolíneas y ofreciendo reportes de los check-ins realizados hasta el momento.
 
 ## Contributors
 
